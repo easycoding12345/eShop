@@ -1,4 +1,5 @@
 
+import domain.ArtikelVW;
 import domain.EShop;
 import entities.Artikel;
 
@@ -11,6 +12,7 @@ public class EShopClientCUI {
 
     private EShop eShop;
     private BufferedReader in;
+    private ArtikelVW artikelVW = new ArtikelVW();
 
     public EShopClientCUI() throws IOException {
 
@@ -19,10 +21,14 @@ public class EShopClientCUI {
         in = new BufferedReader(new InputStreamReader(System.in));
     }
 
+
+    // For tests only!
     private void gibMenueAus() {
         System.out.print("Befehle: \n  Artikel liste:  'a'");
         System.out.print("\n  Artikel einzufuegen:  'ae'");
         System.out.print("\n  Artikel loeschen:  'al'");
+        System.out.print("\n  Artikel in Warenkorb einzufügen:  'we'");
+        System.out.print("\n  Artikel aus der Warenkorb löschen:  'wl'");
         System.out.print("         \n  ---------------------");
         System.out.println("         \n  Beenden:        'q'");
         System.out.print("> "); // Prompt
@@ -41,9 +47,10 @@ public class EShopClientCUI {
         int preis;
         int bestand;
 
-        HashMap artikelListe;
+        HashMap<Integer, Artikel> artikelListe;
+        HashMap<Integer, Artikel> warenkorbListe;
 
-        // For tests only!
+
         switch (line) {
             case "a" -> {
                 artikelListe = eShop.gibAlleArtikel();
@@ -69,10 +76,30 @@ public class EShopClientCUI {
 
             case "al" -> {
                 System.out.println("Artikel ID > ");
-                nummer = liesEingabe();
-                artikelID = Integer.parseInt(nummer);
+                artikelID = Integer.parseInt(liesEingabe());
 
                 eShop.loescheArtikel(artikelID);
+            }
+
+            case "we" -> {
+                System.out.println("Artikel ID > ");
+                artikelID = Integer.parseInt(liesEingabe());
+
+                eShop.fuegeInWarenkorb(artikelID);
+            }
+
+            case "wl" -> {
+                System.out.println("Artikel ID > ");
+                artikelID = Integer.parseInt(liesEingabe());
+
+                eShop.loescheAusWarenkorb(artikelID);
+            }
+
+            case "w" -> {
+                System.out.println("Warenkorb: ");
+
+                warenkorbListe = eShop.gibWarenkorb();
+                gibArtikellisteAus(warenkorbListe);
             }
         }
     }
