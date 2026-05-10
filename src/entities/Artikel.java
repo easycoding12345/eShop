@@ -26,4 +26,12 @@ public class Artikel {
     public float getPreis() {
         return preis;
     }
+
+    public void setBezeichnung(String newBezeichnung) {
+        this.bezeichnung = newBezeichnung;
+    }
+
+    public void setPreis(float newPreis) {
+        this.preis = newPreis;
+    }
 }

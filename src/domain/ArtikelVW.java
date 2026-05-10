@@ -30,8 +30,17 @@ public class ArtikelVW {
         bestandVerringern(artikelID, menge);
     }
 
-    public Artikel artikelFinde(int artikelID) {
-        return artikelListe.get(artikelID);
+    public void bezeichnungVeraendern(int artikelID, String bezeichnung) {
+        artikelListe.get(artikelID).setBezeichnung(bezeichnung);
+    }
+
+    public void preisVeraendern(int artikelID, float preis) {
+        artikelListe.get(artikelID).setPreis(preis);
+    }
+
+    public void artikelVernichten(int artikelID) {
+        artikelListe.remove(artikelID);
+        artikelMengeListe.remove(artikelID);
     }
 
     public HashMap<Integer, Artikel> gibArtikelListe() {

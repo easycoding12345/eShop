@@ -27,18 +27,28 @@ public class EShop {
     }
 
     public HashMap<Integer, Integer> gibWarenkorb() {
-
         return warenkorbVW.gibWarenkorb();
     }
 
-    public void fuegeArtikelEin(int artikelID, String bezeichnung, int bestand, int preis) {
+    public void fuegeArtikelEin(int artikelID, String bezeichnung, int bestand, float preis) {
         Artikel art = new Artikel(artikelID, bezeichnung, preis);
         artikelVW.einfuegen(art, bestand);
     }
 
     public void loescheArtikel(int artikelID, int menge) {
-        System.out.println(artikelID);
         artikelVW.loeschen(artikelID, menge);
+    }
+
+    public void artikelVernichten(int artikelID) {
+        artikelVW.artikelVernichten(artikelID);
+    }
+
+    public void bezeichnungVeraendern(int artikelID, String bezeichnung) {
+        artikelVW.bezeichnungVeraendern(artikelID, bezeichnung);
+    }
+
+    public void preisVeraendern(int artikelID, float preis) {
+        artikelVW.preisVeraendern(artikelID, preis);
     }
 
     public void fuegeInWarenkorb(int artikelID, int menge) {
@@ -53,6 +63,9 @@ public class EShop {
         artikelVW.einfuegen(einArtikel, menge);
     }
 
+    public void zuruecksetzeWarenkorb() {
+        warenkorbVW.zuruecksetzen();
+    }
 
     public void seedTestData() {
         fuegeArtikelEin(1, "Laptop", 999, 10);

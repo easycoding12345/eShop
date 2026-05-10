@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Objects;
 
 public class EShopClientCUI {
 
@@ -26,7 +27,11 @@ public class EShopClientCUI {
         System.out.print("Befehle: \n  Artikel liste:  'a'");
         System.out.print("\n  Artikel einzufuegen:  'ae'");
         System.out.print("\n  Artikel loeschen:  'al'");
+        System.out.print("\n  Artikel Bezeichnung verändern: 'bv'");
+        System.out.print("\n  Artikel Preis verändern: 'pv'");
+        System.out.print("\n  Artikel vernichten: 'vn'");
         System.out.print("\n  Artikel in Warenkorb einzufügen:  'we'");
+        System.out.print("\n  Warenkorb ansehen:  'w'");
         System.out.print("\n  Artikel aus der Warenkorb löschen:  'wl'");
         System.out.print("\n  Artikel kaufen:  'ak'");
         System.out.print("         \n  ---------------------");
@@ -36,25 +41,20 @@ public class EShopClientCUI {
     }
 
     private String liesEingabe() throws IOException {
-        // einlesen von Konsole
         return in.readLine();
     }
 
     private void verarbeiteEingabe(String line) throws IOException {
-        String nummer;
         int artikelID;
         int menge;
         String bezeichnung;
-        int preis;
+        float preis;
         int bestand;
 
         HashMap<Integer, Artikel> artikelListe;
         HashMap<Integer, Integer> warenkorbListe;
 
-
         switch (line) {
-            // TODO: Change name, price and other parameters
-
             case "a" -> {
                 artikelListe = eShop.gibArtikelListe();
                 gibArtikellisteAus(artikelListe, eShop.gibArtikelMengeListe());
@@ -67,7 +67,7 @@ public class EShopClientCUI {
                 System.out.print("Bezeichnung  > ");
                 bezeichnung = liesEingabe();
                 System.out.print("Preis  > ");
-                preis = Integer.parseInt(liesEingabe());
+                preis = Float.parseFloat(liesEingabe());
                 System.out.print("Bestand  > ");
                 bestand = Integer.parseInt(liesEingabe());
 
@@ -114,6 +114,47 @@ public class EShopClientCUI {
             case "ak" -> {
                 warenkorbListe = eShop.gibWarenkorb();
                 gibGekaufteAus(warenkorbListe, eShop.gibArtikelListe());
+                eShop.zuruecksetzeWarenkorb();
+            }
+
+            case "bv" -> {
+                System.out.println("Artikel ID > ");
+                artikelID = Integer.parseInt(liesEingabe());
+                System.out.print("Neue Bezeichnung  > ");
+                bezeichnung = liesEingabe();
+
+                eShop.bezeichnungVeraendern(artikelID, bezeichnung);
+            }
+
+            case "pv" -> {
+                System.out.println("Artikel ID > ");
+                artikelID = Integer.parseInt(liesEingabe());
+                System.out.print("Neuer Preis  > ");
+                preis = Float.parseFloat(liesEingabe());
+
+                eShop.preisVeraendern(artikelID, preis);
+            }
+
+            case "vn" -> {
+                String yellow = "\u001B[33m";
+                String reset = "\u001B[0m";
+
+                System.out.println(yellow + "Sie sind im Begriff, einen Artikel komplett zu löschen!" + reset);
+
+                System.out.println("Artikel ID > ");
+                artikelID = Integer.parseInt(liesEingabe());
+
+                System.out.println(yellow + "Sind Sie sicher, dass Sie diesen Artikel vollständig aus dem Katalog löschen möchten? [y / n]" + reset);
+                System.out.println(eShop.gibArtikelListe().get(artikelID));
+
+                String eingabe = liesEingabe();
+                if (Objects.equals(eingabe, "y")) {
+                    eShop.artikelVernichten(artikelID);
+                    System.out.println("Artikel wurde gelöscht.");
+                } else {
+                    System.out.println("Artikel wurde nicht agelöscht.");
+                }
+
             }
         }
     }
@@ -166,9 +207,7 @@ public class EShopClientCUI {
             }
 
             System.out.println("-".repeat(rechnung_width));
-            System.out.printf("%-11s %27.2f€", "Gesamtpreis", gesamtpreis);
-
-            System.out.println();
+            System.out.printf("%-11s %27.2f€\n", "Gesamtpreis", gesamtpreis);
         }
     }
 

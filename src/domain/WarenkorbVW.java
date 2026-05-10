@@ -22,7 +22,6 @@ public class WarenkorbVW {
             warenkorbMenge.put(artikelID, warenkorbMenge.get(artikelID) - menge);
     }
 
-
     public void einfuegen(int artikelID, int menge) {
         if (warenkorbMenge.containsKey(artikelID))
             mengeErhoehen(artikelID, menge);
@@ -32,6 +31,10 @@ public class WarenkorbVW {
 
     public void loeschen(int artikelID, int menge) {
         mengeVerringern(artikelID, menge);
+    }
+
+    public void zuruecksetzen() {
+        warenkorbMenge.clear();
     }
 
     public HashMap<Integer, Integer> gibWarenkorb() {
