@@ -1,5 +1,7 @@
 import domain.EShop;
 import entities.Artikel;
+import entities.Kunde;
+import entities.Mitarbeiter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +39,8 @@ public class EShopClientCUI {
         System.out.print("         \n  ---------------------");
         System.out.println("         \n  Beenden:        'q'");
         System.out.print("> "); // Prompt
-        System.out.flush(); // ohne NL ausgeben
+        System.out.flush();// ohne NL ausgeben
+        System.out.print("\n Registrieren: 'r' ");//benutzer registrierung
     }
 
     private String liesEingabe() throws IOException {
@@ -50,6 +53,8 @@ public class EShopClientCUI {
         String bezeichnung;
         float preis;
         int bestand;
+        HashMap<Integer, Artikel> artikelListe;
+
 
         HashMap<Integer, Artikel> artikelListe;
         HashMap<Integer, Integer> warenkorbListe;
@@ -156,9 +161,45 @@ public class EShopClientCUI {
                 }
 
             }
+            case "r" -> {
+                System.out.print("benutzerId>");
+                int benutzerId = Integer.parseInt(liesEingabe());//als liesEingabe gibt nur integer ich habe parseInt benutzt
+
+                System.out.print("BenutzerErkennung > ");
+                String benutzerErkennung = liesEingabe();
+
+                System.out.print("benutzerVorNachname");
+                String benutzerVorNachname = liesEingabe();
+
+                System.out.print("Benutzerpassword > ");
+                String benutzerPassword = liesEingabe();
+
+                System.out.print("Typ (k = Kunde, m = Mitarbeiter) > ");
+                String typ = liesEingabe();
+                if (typ.equals("k")) {
+
+                    eShop.getBenutzerVW().registrieren(
+                            new Kunde(benutzerId, benutzerErkennung,
+                                    benutzerVorNachname, benutzerPassword)
+                    );
+
+                } else {
+
+                    eShop.getBenutzerVW().registrieren(
+                            new Mitarbeiter(benutzerId, benutzerErkennung,
+                                    benutzerVorNachname, benutzerPassword)
+                    );
+                }
+
+                System.out.println("✔ Registrierung erfolgreich!");
+            }
+
         }
     }
 
+
+    private void gibArtikellisteAus(HashMap<Integer, Artikel> liste) {
+        if (liste.isEmpty()) {
     private void gibArtikellisteAus(HashMap<Integer, Artikel> artikelListe, HashMap<Integer, Integer> artikelMenge) {
         if (artikelListe.isEmpty()) {
             System.out.println("Liste ist leer.");

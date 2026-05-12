@@ -10,6 +10,17 @@ public class EShop {
 
     private ArtikelVW artikelVW;
 
+    // private KundenVerwaltung kundenVW;
+    // hier weitere Verwaltungsklassen, z.B. für Autoren oder Angestellte
+    private BenutzerVW benutzerVW = new BenutzerVW();
+    // constructor
+    public BenutzerVW getBenutzerVW() {
+        return benutzerVW;
+    }
+
+    public ArtikelVW getArtikelVW() {
+        return artikelVW;
+    }
     private WarenkorbVW warenkorbVW;
 
     public EShop() throws IOException {
