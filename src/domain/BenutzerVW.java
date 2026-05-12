@@ -8,22 +8,26 @@ public class BenutzerVW {
     private Benutzer aktuellerBenutzer;
 
     public void registrieren(Benutzer benutzer){
-        if (benutzerMap.containsKey(benutzer.getBenutzerVorNachname())){
+        if (benutzerMap.containsKey(benutzer.getBenutzerErkennung())){
             throw new IllegalArgumentException("Benutzer existiert bereit!");
         }
-        benutzerMap.put(benutzer.getBenutzerVorNachname(), benutzer);
+        benutzerMap.put(benutzer.getBenutzerErkennung(), benutzer);
         System.out.println("Registrierung erfolgreich");
     }
-    public boolean login(String benutzerName, String benutzerPassword){
-       Benutzer benutzer = benutzerMap.get(benutzerName);
+
+    public Benutzer login(String benutzerErkennung, String benutzerPassword){
+       Benutzer benutzer = benutzerMap.get(benutzerErkennung);
         if (benutzer != null && benutzer.checkPassword(benutzerPassword)) {
             aktuellerBenutzer = benutzer;
-            System.out.println("Login erfogreich.");
-            return true;
+            System.out.println("Login erfolgreich.");
+            return aktuellerBenutzer;
         }
-        System.out.println("Falsher Benutzername oder Password.");
-        return false;
+
+        System.out.println("Falscher Benutzername oder Password.");
+        return null;
     }
+
+
     public void logout(){
         if(aktuellerBenutzer != null){
             System.out.println(aktuellerBenutzer.getBenutzerVorNachname() + "wurde ausgelogt.");
@@ -46,6 +50,7 @@ public class BenutzerVW {
     public boolean istEingeloggt(){
         return aktuellerBenutzer !=null;
     }
+
     public boolean istMitarbeiter(){
         return aktuellerBenutzer != null &&
                 aktuellerBenutzer.getRole().equals("Mitarbeiter");

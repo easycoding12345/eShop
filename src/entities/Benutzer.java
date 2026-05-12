@@ -1,13 +1,11 @@
 package entities;
 
 public  abstract class Benutzer {
-    private int benutzerId;
     private String benutzerErkennung;
     private String benutzerVorNachname; //warum brauchen wir diese, wenn wir benutzerWrkennung haben?
     private String benutzerPassword;
 
-    public Benutzer(int benutzerId, String benutzerErkennung, String benutzerVorNachname, String benutzerPassword){
-        this.benutzerId =benutzerId;
+    public Benutzer(String benutzerErkennung, String benutzerVorNachname, String benutzerPassword){
         this.benutzerErkennung = benutzerErkennung;
         this.benutzerVorNachname = benutzerVorNachname;
         this.benutzerPassword = benutzerPassword;
@@ -40,12 +38,5 @@ public  abstract class Benutzer {
         return benutzerVorNachname;
     }
 
-    public int getBenutzerId() {
-        return benutzerId;
-    }
-
-    public void setBenutzerId(int benutzerId) {
-        benutzerId = benutzerId;
-    }
     public abstract String getRole();
 }

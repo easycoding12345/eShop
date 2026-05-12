@@ -1,8 +1,8 @@
 package entities;
 
 public class Mitarbeiter extends Benutzer{
-    public Mitarbeiter(int benutzerId, String benutzerErkennung, String benutzerVorNachname, String benutzerPassword){
-        super(benutzerId, benutzerErkennung, benutzerVorNachname, benutzerPassword);
+    public Mitarbeiter(String benutzerErkennung, String benutzerVorNachname, String benutzerPassword){
+        super(benutzerErkennung, benutzerVorNachname, benutzerPassword);
     }
 
     @Override
