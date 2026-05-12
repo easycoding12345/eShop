@@ -5,8 +5,8 @@ public class Artikel {
     private String bezeichnung;
     private float preis;
 
-    public Artikel(int artikelNummer, String bezeichnung, float preis) {
-        this.artikelID = artikelNummer;
+    public Artikel(int artikelID, String bezeichnung, float preis) {
+        this.artikelID = artikelID;
         this.bezeichnung = bezeichnung;
         this.preis = preis;
     }

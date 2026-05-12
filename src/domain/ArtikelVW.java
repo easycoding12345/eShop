@@ -1,12 +1,68 @@
 package domain;
 
+import domain.exceptions.ArtikelExistiertBereitsException;
 import entities.Artikel;
+import persistence.FilePersistenceManager;
+import persistence.PersistenceManager;
+
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ArtikelVW {
-    private final HashMap<Integer, Artikel> artikelListe = new HashMap<>();
-    private final HashMap<Integer, Integer> artikelMengeListe = new HashMap<>();
+    private HashMap<Integer, Artikel> artikelListe = new HashMap<>();
+    private HashMap<Integer, Integer> artikelMengeListe = new HashMap<>();
+    private PersistenceManager pm = new FilePersistenceManager();
+
+    public void ladeArtikelMengeDaten (String datei) throws IOException {
+        String dateiAM = datei+"_AM.txt";
+        pm.openForReading(dateiAM);
+        artikelMengeListe = pm.ladeArtikelMenge();
+        ladeArtikelDaten(datei+"_A.txt");
+    }
+
+    public void ladeArtikelDaten(String datei) throws IOException {
+        pm.openForReading(datei);
+
+        Artikel einArtikel;
+
+        do {
+            einArtikel = pm.ladeArtikel();
+
+            if (einArtikel != null) {
+                try {
+                    einfuegen(einArtikel, artikelMengeListe.get(einArtikel.getArtikelID()));
+                } catch (ArtikelExistiertBereitsException e1) {}
+            }
+        } while (einArtikel != null);
+
+        pm.close();
+    }
+
+    public void speichereArtikelMengeDaten(String datei) throws IOException {
+        pm.openForWriting(datei);
+
+        if (!artikelMengeListe.isEmpty())
+            pm.speichereArtikelMenge(artikelMengeListe);
+
+        pm.close();
+    }
+
+    public void speichereArtikelDaten(String datei) throws IOException  {
+        // PersistenzManager für Schreibvorgänge öffnen
+        pm.openForWriting(datei);
+
+        // Durchlaufen einer Liste mit einem Iterator:
+        if (!artikelListe.isEmpty()) {
+            for (Map.Entry<Integer, Artikel> entry : artikelListe.entrySet()) {
+                pm.speichereArtikel(entry.getValue());
+            }
+        }
+
+        // Persistenz-Schnittstelle wieder schließen
+        pm.close();
+    }
 
     public void bestandErhoehen(int artikelID, int menge) {
         artikelMengeListe.put(artikelID, artikelMengeListe.get(artikelID) + menge);

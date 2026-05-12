@@ -15,14 +15,12 @@ import java.util.Map;
 import java.util.Objects;
 
 public class EShopClientCUI {
-
     private EShop eShop;
     private BufferedReader in;
 
     public EShopClientCUI() throws IOException {
 
         eShop = new EShop();
-        eShop.seedTestData(); // test articles
         in = new BufferedReader(new InputStreamReader(System.in));
     }
 
@@ -40,7 +38,8 @@ public class EShopClientCUI {
         System.out.print("\n  Artikel aus der Warenkorb löschen:  'wl'");
         System.out.print("\n  Artikel kaufen:  'ak'");
         System.out.print("\n  Ereignisse anzeigen:  'e'");
-        System.out.print("\n  Registrieren: 'r' ");//benutzer registrierung
+        System.out.print("\n  Registrieren: 'r' "); //benutzer registrierung
+        System.out.print("\n  Speichern: 's' "); //benutzer registrierung
         System.out.print("         \n  ---------------------");
         System.out.println("         \n  Beenden:        'q'");
         System.out.print("> "); // Prompt
@@ -211,6 +210,9 @@ public class EShopClientCUI {
 
                 eShop.gibEreignisseAus();
             }
+
+            case "s" ->
+                eShop.speichereArtikel();
         }
     }
 

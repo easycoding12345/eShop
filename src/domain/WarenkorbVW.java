@@ -1,6 +1,7 @@
 package domain;
 
 import entities.Artikel;
+import entities.Warenkorb;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -11,33 +12,23 @@ import java.util.List;
 
 
 public class WarenkorbVW {
-    private HashMap<Integer, Integer> warenkorbMenge = new HashMap<>();
-
-    public void mengeErhoehen(int artikelID, int menge) {
-        warenkorbMenge.put(artikelID, warenkorbMenge.get(artikelID) + menge);
-    }
-
-    public void mengeVerringern(int artikelID, int menge) {
-        if (warenkorbMenge.get(artikelID) > 0)
-            warenkorbMenge.put(artikelID, warenkorbMenge.get(artikelID) - menge);
-    }
+//    private HashMap<Integer, Integer> warenkorbMenge = new HashMap<>();
+    // Warenkorb warenkorb = new Warenkorb(Benutzer); // TODO: eigentlich sollte hier Benutzer sein
+    Warenkorb warenkorb = new Warenkorb();
 
     public void einfuegen(int artikelID, int menge) {
-        if (warenkorbMenge.containsKey(artikelID))
-            mengeErhoehen(artikelID, menge);
-        else
-            warenkorbMenge.put(artikelID, menge);
+        warenkorb.hinzufuegen(artikelID, menge);
     }
 
     public void loeschen(int artikelID, int menge) {
-        mengeVerringern(artikelID, menge);
+        warenkorb.loeschen(artikelID, menge);
     }
 
     public void zuruecksetzen() {
-        warenkorbMenge.clear();
+        warenkorb.zuruecksetzen();
     }
 
     public HashMap<Integer, Integer> gibWarenkorb() {
-        return warenkorbMenge;
+        return warenkorb.gibWarenkorb();
     }
 }

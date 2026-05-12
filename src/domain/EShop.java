@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 
 public class EShop {
-    private String datei = "";
+    private String datei = "eShop";
 
     // TODO: Sollen sie alle final sein?
     private ArtikelVW artikelVW;
@@ -29,6 +29,7 @@ public class EShop {
     public EShop() throws IOException {
         this.datei = datei;
         artikelVW = new ArtikelVW();
+        artikelVW.ladeArtikelMengeDaten(datei);
         warenkorbVW = new WarenkorbVW();
         ereignisse = new ArrayList<>();
     }
@@ -116,16 +117,8 @@ public class EShop {
         }
     }
 
-    public void seedTestData() {
-        fuegeArtikelEin(1, "Laptop", 999, 10);
-        fuegeArtikelEin(2, "Mouse", 25, 50);
-        fuegeArtikelEin(3, "Keyboard", 70, 30);
-        fuegeArtikelEin(4, "Monitor", 200, 15);
-        fuegeArtikelEin(5, "USB Cable", 5, 100);
-        fuegeArtikelEin(6, "Headphones", 120, 25);
-        fuegeArtikelEin(7, "Webcam", 80, 20);
-        fuegeArtikelEin(8, "Chair", 150, 10);
-        fuegeArtikelEin(9, "Desk", 300, 5);
-        fuegeArtikelEin(10, "SSD 1TB", 110, 40);
+    public void speichereArtikel() throws IOException {
+        artikelVW.speichereArtikelMengeDaten(datei+"_AM.txt");
+        artikelVW.speichereArtikelDaten(datei+"_A.txt");
     }
 }

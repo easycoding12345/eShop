@@ -1,0 +1,108 @@
+package persistence;
+
+import entities.Artikel;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+
+public class FilePersistenceManager implements PersistenceManager {
+    private BufferedReader reader = null;
+    private PrintWriter writer = null;
+
+    public void openForReading(String datei) throws FileNotFoundException {
+        reader = new BufferedReader(new FileReader(datei));
+    }
+
+    public void openForWriting(String datei) throws IOException {
+        writer = new PrintWriter(new BufferedWriter(new FileWriter(datei)));
+    }
+
+    public boolean close() {
+        if (writer != null)
+            writer.close();
+
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public Artikel ladeArtikel() throws IOException {
+        String artikelIDString = liesZeile();
+        if (artikelIDString == null) {
+            // keine Daten mehr vorhanden
+            return null;
+        }
+
+        int artikelID = Integer.parseInt(artikelIDString);
+
+        String bezeichnung = liesZeile();
+
+        String preisString = liesZeile();
+        float preis = Float.parseFloat(preisString);
+
+        return new Artikel(artikelID, bezeichnung, preis);
+    }
+
+    public boolean speichereArtikel(Artikel a) throws IOException {
+        schreibeZeile(String.valueOf(a.getArtikelID()));
+        schreibeZeile(a.getBezeichnung());
+        schreibeZeile(String.valueOf(a.getPreis()));
+
+        return true;
+    }
+
+    public HashMap<Integer, Integer> ladeArtikelMenge() throws IOException {
+        HashMap<Integer, Integer> artikelMengeListe = new HashMap<>();
+        while (true) {
+            String bestandString = liesZeile();
+            if (bestandString == null || bestandString.equals("EOF")) {
+                // keine Daten mehr vorhanden
+                return artikelMengeListe;
+            }
+
+            int artikelID = Integer.parseInt(bestandString.split(":")[0]);
+            int bestand = Integer.parseInt(bestandString.split(":")[1]);
+            artikelMengeListe.put(artikelID, bestand);
+        }
+    }
+
+    public boolean speichereArtikelMenge(HashMap<Integer, Integer> hm) throws IOException {
+        for (Map.Entry<Integer, Integer> entry : hm.entrySet()) {
+            int artikelID = entry.getKey();
+            int artikelBestand = entry.getValue();
+            schreibeZeile(artikelID + ":" + artikelBestand);
+        }
+
+        schreibeZeile("EOF");
+
+        return true;
+    }
+
+
+    /*
+     *  Für Warenkorb, Kunden und Ereignisse!
+     */
+
+
+    private String liesZeile() throws IOException {
+        if (reader != null)
+            return reader.readLine();
+        else
+            return "";
+    }
+
+    private void schreibeZeile(String daten) {
+        if (writer != null)
+            writer.println(daten);
+    }
+}
