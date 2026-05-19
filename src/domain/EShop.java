@@ -59,14 +59,14 @@ public class EShop {
          * Ereignis erzeugen:
          * Einlagerung durch Mitarbeiter
          */
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), art, menge, "Einlagerung", mitarbeiter);
+        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), art, menge, "Einlagerung", "m:" + mitarbeiter);
         ereignisse.add(ereignis);
     }
 
     public void loescheArtikel(int artikelID, int menge, String mitarbeiter) {
         artikelVW.loeschen(artikelID, menge);
 
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", mitarbeiter);
+        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "m:" + mitarbeiter);
         ereignisse.add(ereignis);
     }
 
@@ -86,7 +86,7 @@ public class EShop {
         warenkorbVW.einfuegen(artikelID, menge);
         artikelVW.loeschen(artikelID, menge);
 
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", kunde);
+        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
         ereignisse.add(ereignis);
     }
 
@@ -95,7 +95,7 @@ public class EShop {
         warenkorbVW.loeschen(artikelID, menge);
         artikelVW.einfuegen(einArtikel, menge);
 
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Einlagerung", kunde);
+        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Einlagerung", "k:" + kunde);
         ereignisse.add(ereignis);
     }
 

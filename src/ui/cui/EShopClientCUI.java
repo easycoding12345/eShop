@@ -54,6 +54,7 @@ public class EShopClientCUI {
             System.out.println("vn → Artikel vernichten");
             System.out.println("e  → Ereignisse anzeigen");
             System.out.println("es → Ereignisse speichern");
+            System.out.println("rm → Neuen Mitarbeiter registrieren");
             System.out.println("s  → Daten speichern");
             System.out.println("o  → Logout");
         }
@@ -81,7 +82,7 @@ public class EShopClientCUI {
         String bezeichnung;
         float preis;
         int bestand;
-        String user;
+        Benutzer aktuelleBenutzer;
 
 
         HashMap<Integer, Artikel> artikelListe;
@@ -126,14 +127,14 @@ public class EShopClientCUI {
                 System.out.print("Bestand > ");
                 bestand = Integer.parseInt(liesEingabe());
 
-                user = eShop.getBenutzerVW().getAktuellerBenutzer().getBenutzerVorNachname();
+                aktuelleBenutzer = eShop.getBenutzerVW().getAktuellerBenutzer();
                 // Artikel hinzufügen
                 eShop.fuegeArtikelEin(
                         artikelID,
                         bezeichnung,
                         bestand,
                         preis,
-                        user
+                        aktuelleBenutzer.getBenutzerVorNachname()
                 );
                 System.out.println("✔ Artikel erfolgreich hinzugefügt.");
             }
@@ -156,13 +157,13 @@ public class EShopClientCUI {
                 System.out.print("Menge > ");
                 menge = Integer.parseInt(liesEingabe());
 
-                user = eShop.getBenutzerVW().getAktuellerBenutzer().getBenutzerVorNachname();
+                aktuelleBenutzer = eShop.getBenutzerVW().getAktuellerBenutzer();
 
                 // Artikelbestand reduzieren
                 eShop.loescheArtikel(
                         artikelID,
                         menge,
-                        user
+                        aktuelleBenutzer.getBenutzerVorNachname()
                 );
                 System.out.println("✔ Artikelbestand erfolgreich reduziert.");
             }
@@ -182,9 +183,9 @@ public class EShopClientCUI {
                 System.out.print("Menge der Artikel > ");
                 menge = Integer.parseInt(liesEingabe());
 
-                user = eShop.getBenutzerVW().getAktuellerBenutzer().getBenutzerVorNachname();
+                aktuelleBenutzer = eShop.getBenutzerVW().getAktuellerBenutzer();
 
-                eShop.fuegeInWarenkorb(artikelID, menge, user);
+                eShop.fuegeInWarenkorb(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
 
                 System.out.println("✔ Artikel wurde zum Warenkorb hinzugefügt.");
             }
@@ -204,9 +205,9 @@ public class EShopClientCUI {
                 System.out.print("Menge der Artikel > ");
                 menge = Integer.parseInt(liesEingabe());
 
-                user = eShop.getBenutzerVW().getAktuellerBenutzer().getBenutzerVorNachname();
+                aktuelleBenutzer = eShop.getBenutzerVW().getAktuellerBenutzer();
 
-                eShop.loescheAusWarenkorb(artikelID, menge, user);
+                eShop.loescheAusWarenkorb(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
 
                 System.out.println("✔ Artikel wurde aus dem Warenkorb entfernt.");
             }
@@ -340,12 +341,7 @@ public class EShopClientCUI {
             }
             case "r" -> {
                 // TODO: Nur Mitarbeiter kann andere Mitarbeiter registrieren
-                System.out.println("Rolle wählen:");
-                System.out.println("1 → Kunde");
-                System.out.println("2 → Mitarbeiter");
-
-                System.out.print("> ");
-                String rolle = liesEingabe();
+                System.out.println("Registration als Kunde:");
 
                 System.out.print("Benutzer ID > ");
                 int benutzerId = Integer.parseInt(liesEingabe());
@@ -359,9 +355,7 @@ public class EShopClientCUI {
                 System.out.print("Passwort > ");
                 String benutzerPassword = liesEingabe();
 
-                if (rolle.equals("1")) {
-
-                    eShop.getBenutzerVW().registrieren(
+                eShop.getBenutzerVW().registrieren(
                             new Kunde(
                                     benutzerId,
                                     benutzerErkennung,
@@ -371,24 +365,39 @@ public class EShopClientCUI {
                     );
 
                     System.out.println("✔ Kunde erfolgreich registriert.");
+            }
 
-                } else if (rolle.equals("2")) {
-
-                    eShop.getBenutzerVW().registrieren(
-                            new Mitarbeiter(
-                                    benutzerId,
-                                    benutzerErkennung,
-                                    benutzerVorNachname,
-                                    benutzerPassword
-                            )
-                    );
-
-                    System.out.println("✔ Mitarbeiter erfolgreich registriert.");
-
-                } else {
-
-                    System.out.println("Ungültige Rollenauswahl.");
+            case "rm" -> {
+                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                    System.out.println("Nur Mitarbeiter dürfen neue Mitarbeiter registrieren.");
+                    break;
                 }
+
+                System.out.println("Registration als Mitarbeiter:");
+
+                System.out.print("Benutzer ID > ");
+                int benutzerId = Integer.parseInt(liesEingabe());
+
+                System.out.print("Benutzername > ");
+                String benutzerErkennung = liesEingabe();
+
+                System.out.print("Vor- und Nachname > ");
+                String benutzerVorNachname = liesEingabe();
+
+                System.out.print("Passwort > ");
+                String benutzerPassword = liesEingabe();
+
+
+                eShop.getBenutzerVW().registrieren(
+                        new Mitarbeiter(
+                                benutzerId,
+                                benutzerErkennung,
+                                benutzerVorNachname,
+                                benutzerPassword
+                        )
+                );
+
+                System.out.println("✔ Mitarbeiter erfolgreich registriert.");
             }
 
             case "l" -> {

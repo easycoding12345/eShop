@@ -89,6 +89,7 @@ public class BenutzerVW {
 
     }
 
+    // TODO: Jetzt es gibt das Problem, dass Kunde wird als Mitarbeiter gesehen, nachdem die Daten gelesen werden
     public void ladeBenutzer() {
         try {
             BufferedReader reader;
