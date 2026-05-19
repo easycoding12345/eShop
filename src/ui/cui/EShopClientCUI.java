@@ -17,6 +17,10 @@ import java.util.Objects;
 public class EShopClientCUI {
     private EShop eShop;
     private BufferedReader in;
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
 
     public EShopClientCUI() throws IOException {
 
@@ -106,7 +110,6 @@ public class EShopClientCUI {
             }
 
             case "ae" -> {
-
                 // Prüfen ob Benutzer eingeloggt ist
                 if (!eShop.getBenutzerVW().istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
@@ -114,7 +117,7 @@ public class EShopClientCUI {
                 }
                 // Prüfen ob Mitarbeiter eingeloggt ist
                 if (!eShop.getBenutzerVW().istMitarbeiter()) {
-                    System.out.println("Nur Mitarbeiter duerfen Artikel hinzufügen.");
+                    System.out.println("Nur Mitarbeiter dürfen Artikel hinzufügen.");
                     break;
                 }
                 // Artikelinformationen eingeben
@@ -136,7 +139,7 @@ public class EShopClientCUI {
                         preis,
                         aktuelleBenutzer.getBenutzerVorNachname()
                 );
-                System.out.println("✔ Artikel erfolgreich hinzugefügt.");
+                System.out.println(GREEN + "✔ Artikel erfolgreich hinzugefügt." + RESET);
             }
 
             case "al" -> {
@@ -165,7 +168,7 @@ public class EShopClientCUI {
                         menge,
                         aktuelleBenutzer.getBenutzerVorNachname()
                 );
-                System.out.println("✔ Artikelbestand erfolgreich reduziert.");
+                System.out.println(YELLOW + "✔ Artikelbestand erfolgreich reduziert." + RESET);
             }
 
             case "we" -> {
@@ -187,7 +190,7 @@ public class EShopClientCUI {
 
                 eShop.fuegeInWarenkorb(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
 
-                System.out.println("✔ Artikel wurde zum Warenkorb hinzugefügt.");
+                System.out.println(GREEN + "✔ Artikel wurde zum Warenkorb hinzugefügt." + RESET);
             }
 
             case "wl" -> {
@@ -209,7 +212,7 @@ public class EShopClientCUI {
 
                 eShop.loescheAusWarenkorb(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
 
-                System.out.println("✔ Artikel wurde aus dem Warenkorb entfernt.");
+                System.out.println(YELLOW + "✔ Artikel wurde aus dem Warenkorb entfernt." + RESET);
             }
 
             case "w" -> {
@@ -244,7 +247,7 @@ public class EShopClientCUI {
                         eShop.gibArtikelListe()
                 );
                 eShop.zuruecksetzeWarenkorb();
-                System.out.println("✔ Einkauf erfolgreich abgeschlossen.");
+                System.out.println(GREEN + "✔ Einkauf erfolgreich abgeschlossen." + RESET);
             }
 
             case "bv" -> {
@@ -262,7 +265,7 @@ public class EShopClientCUI {
                 System.out.print("Neue Bezeichnung > ");
                 bezeichnung = liesEingabe();
                 eShop.bezeichnungVeraendern(artikelID, bezeichnung);
-                System.out.println("✔ Bezeichnung erfolgreich geändert.");
+                System.out.println(YELLOW + "✔ Bezeichnung erfolgreich geändert." + RESET);
             }
 
             case "pv" -> {
@@ -285,7 +288,7 @@ public class EShopClientCUI {
 
                 eShop.preisVeraendern(artikelID, preis);
 
-                System.out.println("✔ Preis erfolgreich geändert.");
+                System.out.println(YELLOW + "✔ Preis erfolgreich geändert." + RESET);
             }
 
             case "vn" -> {
@@ -300,22 +303,19 @@ public class EShopClientCUI {
                     break;
                 }
 
-                String yellow = "\u001B[33m";
-                String reset = "\u001B[0m";
-
                 System.out.println(
-                        yellow +
+                        RED +
                                 "Sie sind im Begriff, einen Artikel komplett zu löschen!"
-                                + reset
+                                + RESET
                 );
 
                 System.out.print("Artikel ID > ");
                 artikelID = Integer.parseInt(liesEingabe());
 
                 System.out.println(
-                        yellow +
+                        RED +
                                 "Sind Sie sicher? [y / n]"
-                                + reset
+                                + RESET
                 );
 
                 System.out.println(
@@ -329,18 +329,17 @@ public class EShopClientCUI {
                     eShop.artikelVernichten(artikelID);
 
                     System.out.println(
-                            "✔ Artikel wurde vollständig gelöscht."
+                            RED + "✔ Artikel wurde vollständig gelöscht." + RESET
                     );
 
                 } else {
 
                     System.out.println(
-                            "Löschvorgang abgebrochen."
+                            YELLOW + "Löschvorgang abgebrochen." + RESET
                     );
                 }
             }
             case "r" -> {
-                // TODO: Nur Mitarbeiter kann andere Mitarbeiter registrieren
                 System.out.println("Registration als Kunde:");
 
                 System.out.print("Benutzer ID > ");
@@ -364,7 +363,7 @@ public class EShopClientCUI {
                             )
                     );
 
-                    System.out.println("✔ Kunde erfolgreich registriert.");
+                    System.out.println(GREEN + "✔ Kunde erfolgreich registriert." + RESET);
             }
 
             case "rm" -> {
@@ -397,7 +396,7 @@ public class EShopClientCUI {
                         )
                 );
 
-                System.out.println("✔ Mitarbeiter erfolgreich registriert.");
+                System.out.println(GREEN + "✔ Mitarbeiter erfolgreich registriert." + RESET);
             }
 
             case "l" -> {
@@ -428,9 +427,9 @@ public class EShopClientCUI {
                             eShop.getBenutzerVW().getAktuellerBenutzer();
 
                     System.out.println(
-                            "✔ Login erfolgreich. Willkommen "
+                            GREEN + "✔ Login erfolgreich. Willkommen "
                                     + aktuellerBenutzer.getBenutzerVorNachname()
-                                    + " (" + aktuellerBenutzer.getRole() + ")"
+                                    + " (" + aktuellerBenutzer.getRole() + ")" + RESET
                     );
 
                 } else {
@@ -453,24 +452,24 @@ public class EShopClientCUI {
                 }
 
                 System.out.print(
-                        "Möchten Sie sich wirklich ausloggen? (ja/nein) > "
+                        YELLOW + "Möchten Sie sich wirklich ausloggen? [y/n] > " + RESET
                 );
 
                 String antwort =
                         liesEingabe().trim().toLowerCase();
 
-                if (antwort.equals("ja")) {
+                if (antwort.equals("y")) {
 
                     eShop.getBenutzerVW().logout();
 
                     System.out.println(
-                            "✔ Logout erfolgreich."
+                            GREEN + "✔ Logout erfolgreich." + RESET
                     );
 
-                } else if (antwort.equals("nein")) {
+                } else if (antwort.equals("n")) {
 
                     System.out.println(
-                            "Logout abgebrochen."
+                            YELLOW + "Logout abgebrochen." + RESET
                     );
 
                 } else {
@@ -513,7 +512,7 @@ public class EShopClientCUI {
 
                 eShop.speichereEreignisseTXT();
 
-                System.out.println("✔ Ereignisse erfolgreich gespeichert.");
+                System.out.println(GREEN + "✔ Ereignisse erfolgreich gespeichert." + RESET);
             }
 
 
@@ -531,7 +530,7 @@ public class EShopClientCUI {
 
                 eShop.speichereArtikel();
 
-                System.out.println("✔ Artikeldaten erfolgreich gespeichert.");
+                System.out.println(GREEN + "✔ Artikeldaten erfolgreich gespeichert." + RESET);
             }
         }
     }
