@@ -1,10 +1,7 @@
 package ui.cui;
 
 import domain.EShop;
-import entities.Artikel;
-import entities.Benutzer;
-import entities.Kunde;
-import entities.Mitarbeiter;
+import entities.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -265,10 +262,11 @@ public class EShopClientCUI {
                     break;
                 }
                 warenkorbListe = eShop.gibWarenkorb();
-                gibGekaufteAus(
-                        warenkorbListe,
-                        eShop.gibArtikelListe()
-                );
+                aktuelleBenutzer = eShop.aktuellerBenutzer();
+
+                Rechnung rechnung = new Rechnung(aktuelleBenutzer.getBenutzerVorNachname(), warenkorbListe, eShop.gibArtikelListe());
+                gibRechnungAus(rechnung);
+
                 eShop.zuruecksetzeWarenkorb();
                 System.out.println(GREEN + "✔ Einkauf erfolgreich abgeschlossen." + RESET);
             }
@@ -553,24 +551,6 @@ public class EShopClientCUI {
 
                 System.out.println(GREEN + "✔ Ereignisse erfolgreich gespeichert." + RESET);
             }
-
-
-            case "s" -> {
-
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
-                    System.out.println("Bitte zuerst einloggen.");
-                    break;
-                }
-
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
-                    System.out.println("Nur Mitarbeiter dürfen Daten speichern.");
-                    break;
-                }
-
-                eShop.speichereArtikel();
-
-                System.out.println(GREEN + "✔ Artikeldaten erfolgreich gespeichert." + RESET);
-            }
         }
     }
 
@@ -597,45 +577,29 @@ public class EShopClientCUI {
         }
     }
 
-    public void gibGekaufteAus(HashMap<Integer, Integer> warenkorbListe, HashMap<Integer, Artikel> artikelListe) {
-        if (warenkorbListe.isEmpty()) {
-            System.out.println("Warenkorb ist leer.");
-        } else {
-            int rechnung_width = 40;
-            float summe = 0;
-            double mwstSumme;
-            double gesamtpreis;
-            final double MWST = 0.19;
+    public void gibRechnungAus(Rechnung rechnung) {
+        int rechnung_width = 40;
 
-            LocalDate today = LocalDate.now();
-            String kundeName = eShop.aktuellerBenutzer().getBenutzerVorNachname();// mussen wir alle logic im eshop machen
+        System.out.println();
+        System.out.println(" ".repeat((rechnung_width - 8) / 2) + "Rechnung");
+        System.out.printf("%-10s %29s\n", rechnung.getHeutigesDatum(), rechnung.getKundeName());
+        System.out.println("-".repeat(rechnung_width));
 
-            System.out.println();
-            System.out.println(" ".repeat((rechnung_width - 8) / 2) + "Rechnung");
-            System.out.printf("%-10s %29s\n", today, kundeName);
-            System.out.println("-".repeat(rechnung_width));
-
-            for (Map.Entry<Integer, Integer> entry : warenkorbListe.entrySet()) {
-                Artikel curArt = artikelListe.get(entry.getKey());
-                System.out.printf(
-                        "%-11s %12s€ %13.2f€\n",
-                        curArt.getBezeichnung(),
-                        entry.getValue() + " × " + String.format("%.2f", curArt.getPreis()),
-                        curArt.getPreis() * entry.getValue()
-                );
-
-                summe += entry.getValue() * curArt.getPreis();
-            }
-
-            mwstSumme = MWST * summe;
-            gesamtpreis = mwstSumme + summe;
-
-            System.out.println("-".repeat(rechnung_width));
-            System.out.printf("%-11s %27.2f€\n", "Summe", summe);
-            System.out.printf("%-11s %27.2f€\n", "MWSt", mwstSumme);
-            System.out.printf("%-11s %27.2f€\n", "Gesamtpreis", gesamtpreis);
-
+        for (Map.Entry<Integer, Integer> entry : rechnung.gibWarenkorbListe().entrySet()) {
+            Artikel curArt = eShop.gibArtikelListe().get(entry.getKey());
+            System.out.printf(
+                    "%-11s %12s€ %13.2f€\n",
+                    curArt.getBezeichnung(),
+                    entry.getValue() + " × " + String.format("%.2f", curArt.getPreis()),
+                    curArt.getPreis() * entry.getValue()
+            );
         }
+
+        System.out.println("-".repeat(rechnung_width));
+        System.out.printf("%-11s %27.2f€\n", "Summe", rechnung.getSumme());
+        System.out.printf("%-11s %27.2f€\n", "MWSt", rechnung.getMwst());
+        System.out.printf("%-11s %27.2f€\n", "Gesamtpreis", rechnung.getGesamtPreis());
+
     }
 
     public void run() {

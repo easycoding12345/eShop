@@ -52,7 +52,7 @@ public class EShop {
     }
 
 
-    public void fuegeArtikelEin(int artikelID, String bezeichnung, int menge, float preis, String mitarbeiter) {
+    public void fuegeArtikelEin(int artikelID, String bezeichnung, int menge, float preis, String mitarbeiter) throws IOException {
         Artikel art = new Artikel(artikelID, bezeichnung, preis);
         artikelVW.einfuegen(art, menge);
 
@@ -62,42 +62,44 @@ public class EShop {
          */
         Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), art, menge, "Einlagerung", "m:" + mitarbeiter);
         ereignisse.add(ereignis);
+
+        speichereArtikel();
     }
 
-    public void loescheArtikel(int artikelID, int menge, String mitarbeiter) {
-        artikelVW.loeschen(artikelID, menge);
-
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "m:" + mitarbeiter);
-        ereignisse.add(ereignis);
-    }
-
-    public void artikelVernichten(int artikelID) {
+    public void artikelVernichten(int artikelID) throws IOException {
         artikelVW.artikelVernichten(artikelID);
+        speichereArtikel();
     }
 
-    public void bezeichnungVeraendern(int artikelID, String bezeichnung) {
+    public void bezeichnungVeraendern(int artikelID, String bezeichnung) throws IOException {
         artikelVW.bezeichnungVeraendern(artikelID, bezeichnung);
+        speichereArtikel();
     }
 
-    public void preisVeraendern(int artikelID, float preis) {
+    public void preisVeraendern(int artikelID, float preis) throws IOException {
         artikelVW.preisVeraendern(artikelID, preis);
+        speichereArtikel();
     }
 
-    public void fuegeInWarenkorb(int artikelID, int menge, String kunde) {
+    public void fuegeInWarenkorb(int artikelID, int menge, String kunde) throws IOException {
         warenkorbVW.einfuegen(artikelID, menge);
         artikelVW.loeschen(artikelID, menge);
 
         Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
         ereignisse.add(ereignis);
+
+        speichereArtikel();
     }
 
-    public void loescheAusWarenkorb(int artikelID, int menge, String kunde) {
+    public void loescheAusWarenkorb(int artikelID, int menge, String kunde) throws IOException {
         Artikel einArtikel = artikelVW.gibArtikelListe().get(artikelID);
         warenkorbVW.loeschen(artikelID, menge);
         artikelVW.einfuegen(einArtikel, menge);
 
         Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Einlagerung", "k:" + kunde);
         ereignisse.add(ereignis);
+
+        speichereArtikel();
     }
 
     public void zuruecksetzeWarenkorb() {
@@ -162,7 +164,7 @@ public class EShop {
         return artikelVW.sucheNachIDMitBezeichnung(bezeichnung);
     }
 
-    public void bestandVeraendern(int artikelID, int neuerBestand, String mitarbeiter) {
+    public void bestandVeraendern(int artikelID, int neuerBestand, String mitarbeiter) throws IOException {
         int aktuellerBestand = artikelVW.gibBestand(artikelID);
         if (aktuellerBestand < neuerBestand) {
             artikelVW.bestandErhoehen(artikelID, neuerBestand - aktuellerBestand);
@@ -175,5 +177,7 @@ public class EShop {
             Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), aktuellerBestand - neuerBestand, "Auslagerung", "m:" + mitarbeiter);
             ereignisse.add(ereignis);
         }
+
+        speichereArtikel();
     }
 }
