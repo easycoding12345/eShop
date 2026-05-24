@@ -154,9 +154,26 @@ public class EShop {
         artikelVW.speichereArtikelDaten(datei+"_A.txt");
     }
 
-    public Benutzer aktuellerBenutzer ( ) {
-
+    public Benutzer aktuellerBenutzer () {
         return benutzerVW.getAktuellerBenutzer();
     }
 
+    public int sucheNachID(String bezeichnung) {
+        return artikelVW.sucheNachIDMitBezeichnung(bezeichnung);
+    }
+
+    public void bestandVeraendern(int artikelID, int neuerBestand, String mitarbeiter) {
+        int aktuellerBestand = artikelVW.gibBestand(artikelID);
+        if (aktuellerBestand < neuerBestand) {
+            artikelVW.bestandErhoehen(artikelID, neuerBestand - aktuellerBestand);
+
+            Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), neuerBestand - aktuellerBestand, "Einlagerung", "m:" + mitarbeiter);
+            ereignisse.add(ereignis);
+        } else {
+            artikelVW.bestandVerringern(artikelID, aktuellerBestand - neuerBestand);
+
+            Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), aktuellerBestand - neuerBestand, "Auslagerung", "m:" + mitarbeiter);
+            ereignisse.add(ereignis);
+        }
+    }
 }
