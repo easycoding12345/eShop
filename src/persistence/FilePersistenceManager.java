@@ -1,8 +1,10 @@
 package persistence;
 
 import entities.Artikel;
+import entities.Ereignis;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,5 +106,17 @@ public class FilePersistenceManager implements PersistenceManager {
     private void schreibeZeile(String daten) {
         if (writer != null)
             writer.println(daten);
+    }
+
+    @Override
+    public void speichereEreignisArtikel(ArrayList<Ereignis> ereignisse) throws IOException {
+
+        FileWriter fw = new FileWriter("Ereignisse.txt");
+        PrintWriter pw = new PrintWriter(fw);
+
+        for (Ereignis ereignis : ereignisse) {
+            pw.println(ereignis);
+        }
+        pw.close();
     }
 }

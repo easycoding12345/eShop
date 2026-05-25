@@ -3,6 +3,9 @@ package persistence;
 import domain.WarenkorbVW;
 import entities.Artikel;
 import entities.Warenkorb;
+import entities.Ereignis;
+
+import java.util.ArrayList;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,4 +38,6 @@ public interface PersistenceManager {
 	/*
 	 *  Für Kunden und Ereignisse!
 	*/
+
+    public void speichereEreignisArtikel(ArrayList<Ereignis> ereignisse) throws IOException;
 }
