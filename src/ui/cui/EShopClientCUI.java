@@ -1,18 +1,14 @@
 package ui.cui;
 
 import domain.EShop;
-import entities.Artikel;
 import entities.Benutzer;
-import entities.Kunde;
-import entities.Mitarbeiter;
+import entities.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashMap;
+import java.util.*;
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.Objects;
 
 public class EShopClientCUI {
     private EShop eShop;
@@ -31,7 +27,7 @@ public class EShopClientCUI {
     private void gibMenueAus() {
 
         // fuer Kunde
-        if (eShop.getBenutzerVW().istKunde()) {
+        if (eShop.istKunde()) {
 
             System.out.println("\n===== KUNDENMENÜ =====");
 
@@ -44,16 +40,16 @@ public class EShopClientCUI {
         }
 
         // fuer Mitarbeiter
-        else if (eShop.getBenutzerVW().istMitarbeiter()) {
+        else if (eShop.istMitarbeiter()) {
 
             System.out.println("\n===== MITARBEITERMENÜ =====");
 
             System.out.println("a  → Artikel ansehen");
-            System.out.println("ae → Artikel hinzufügen");
-            System.out.println("al → Artikel löschen");
+            System.out.println("ae → Neuer Artikel in Katalog hinzufügen");
             System.out.println("bv → Bezeichnung ändern");
+            System.out.println("al → Artikel aus dem Katalog komplett löschen");
+            System.out.println("bsv → Bestand ändern");
             System.out.println("pv → Preis ändern");
-            System.out.println("vn → Artikel vernichten");
             System.out.println("e  → Ereignisse anzeigen");
             System.out.println("es → Ereignisse speichern");
             System.out.println("rm → Neuen Mitarbeiter registrieren");
@@ -94,7 +90,7 @@ public class EShopClientCUI {
             case "a" -> {
 
                 // Prüfen ob Benutzer eingeloggt ist
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
 
                     System.out.println("Bitte zuerst einloggen.");
                     break;
@@ -109,24 +105,36 @@ public class EShopClientCUI {
 
             case "ae" -> {
                 // Prüfen ob Benutzer eingeloggt ist
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
-                    System.out.println("Bitte zuerst einloggen.");
+                if (!eShop.istEingeloggt()) {
+                    System.out.println("Bitte zuerst einloggen."); // TODO: Exception?
                     break;
                 }
                 // Prüfen ob Mitarbeiter eingeloggt ist
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
-                    System.out.println("Nur Mitarbeiter dürfen Artikel hinzufügen.");
+                if (!eShop.istMitarbeiter()) {
+                    System.out.println("Nur Mitarbeiter dürfen Artikel hinzufügen."); // TODO: Exception?
                     break;
                 }
+
                 // Artikelinformationen eingeben
-                System.out.print("ArtikelID > ");
-                artikelID = Integer.parseInt(liesEingabe());
                 System.out.print("Bezeichnung > ");
                 bezeichnung = liesEingabe();
+                if (eShop.sucheNachID(bezeichnung) != -1) {
+                    System.out.println("Artikel mit solcher Bezeichnung existiert bereits"); // TODO: Exception?
+                    break;
+                }
+
                 System.out.print("Preis > ");
-                preis = Float.parseFloat(liesEingabe());
+                preis = Float.parseFloat(liesEingabe()); // TODO: Exception
                 System.out.print("Bestand > ");
-                bestand = Integer.parseInt(liesEingabe());
+                bestand = Integer.parseInt(liesEingabe()); // TODO: Exception
+
+                ArrayList<Integer> vorhandeneIDs = new ArrayList<>(eShop.gibArtikelListe().keySet());
+                Collections.sort(vorhandeneIDs);
+
+                if (vorhandeneIDs.isEmpty())
+                    artikelID = 1;
+                else
+                    artikelID = vorhandeneIDs.getLast() + 1;
 
                 aktuelleBenutzer = eShop.aktuellerBenutzer();
                 // Artikel hinzufügen
@@ -140,49 +148,57 @@ public class EShopClientCUI {
                 System.out.println(GREEN + "✔ Artikel erfolgreich hinzugefügt." + RESET);
             }
 
-            case "al" -> {
+            case "bsv" -> {
                 //Prüfen ob Benutzer eingeloggt ist
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
-
-                    System.out.println("Bitte zuerst einloggen.");
+                if (!eShop.istEingeloggt()) {
+                    System.out.println("Bitte zuerst einloggen."); // TODO: Exception?
                     break;
                 }
                 // Prüfen ob Mitarbeiter eingeloggt ist
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
-                    System.out.println("Nur Mitarbeiter dürfen Artikel löschen.");
+                if (!eShop.istMitarbeiter()) {
+                    System.out.println("Nur Mitarbeiter dürfen Artikel löschen."); // TODO: Exception?
                     break;
                 }
+
                 // Artikelinformationen eingeben
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
-                System.out.print("Menge > ");
-                menge = Integer.parseInt(liesEingabe());
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
+
+                System.out.print("Neuer Bestand > ");
+                menge = Integer.parseInt(liesEingabe()); // TODO: Exception
 
                 aktuelleBenutzer = eShop.aktuellerBenutzer();
 
-                // Artikelbestand reduzieren
-                eShop.loescheArtikel(
-                        artikelID,
-                        menge,
-                        aktuelleBenutzer.getBenutzerVorNachname()
-                );
-                System.out.println(YELLOW + "✔ Artikelbestand erfolgreich reduziert." + RESET);
+                eShop.bestandVeraendern(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
+
+                System.out.println(YELLOW + "✔ Artikelbestand erfolgreich verändert." + RESET);
             }
 
             case "we" -> {
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
-                if (!eShop.getBenutzerVW().istKunde()) {
+                if (!eShop.istKunde()) {
                     System.out.println("Nur Kunden dürfen Artikel kaufen.");
                     break;
                 }
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
+                
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+                
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
 
                 System.out.print("Menge der Artikel > ");
-                menge = Integer.parseInt(liesEingabe());
+                menge = Integer.parseInt(liesEingabe()); // TODO: Exception
 
                 aktuelleBenutzer = eShop.aktuellerBenutzer();
 
@@ -192,16 +208,23 @@ public class EShopClientCUI {
             }
 
             case "wl" -> {
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
-                if (!eShop.getBenutzerVW().istKunde()) {
+                if (!eShop.istKunde()) {
                     System.out.println("Nur Kunden dürfen den Warenkorb ändern.");
                     break;
                 }
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
+                
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
+
 
                 System.out.print("Menge der Artikel > ");
                 menge = Integer.parseInt(liesEingabe());
@@ -214,11 +237,11 @@ public class EShopClientCUI {
             }
 
             case "w" -> {
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
-                if (!eShop.getBenutzerVW().istKunde()) {
+                if (!eShop.istKunde()) {
                     System.out.println("Nur Kunden haben einen Warenkorb.");
                     break;
                 }
@@ -231,34 +254,41 @@ public class EShopClientCUI {
             }
 
             case "ak" -> {
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
-                if (!eShop.getBenutzerVW().istKunde()) {
+                if (!eShop.istKunde()) {
                     System.out.println("Nur Kunden dürfen Artikel kaufen.");
                     break;
                 }
                 warenkorbListe = eShop.gibWarenkorb();
-                gibGekaufteAus(
-                        warenkorbListe,
-                        eShop.gibArtikelListe()
-                );
+                aktuelleBenutzer = eShop.aktuellerBenutzer();
+
+                Rechnung rechnung = new Rechnung(aktuelleBenutzer.getBenutzerVorNachname(), warenkorbListe, eShop.gibArtikelListe());
+                gibRechnungAus(rechnung);
+
                 eShop.zuruecksetzeWarenkorb();
                 System.out.println(GREEN + "✔ Einkauf erfolgreich abgeschlossen." + RESET);
             }
 
             case "bv" -> {
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen Artikel bearbeiten.");
                     break;
                 }
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
+
 
                 System.out.print("Neue Bezeichnung > ");
                 bezeichnung = liesEingabe();
@@ -268,18 +298,24 @@ public class EShopClientCUI {
 
             case "pv" -> {
 
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
 
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen Preise ändern.");
                     break;
                 }
 
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+                
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
+
 
                 System.out.print("Neuer Preis > ");
                 preis = Float.parseFloat(liesEingabe());
@@ -289,14 +325,14 @@ public class EShopClientCUI {
                 System.out.println(YELLOW + "✔ Preis erfolgreich geändert." + RESET);
             }
 
-            case "vn" -> {
+            case "al" -> {
 
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
 
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen Artikel vernichten.");
                     break;
                 }
@@ -307,8 +343,14 @@ public class EShopClientCUI {
                                 + RESET
                 );
 
-                System.out.print("Artikel ID > ");
-                artikelID = Integer.parseInt(liesEingabe());
+                System.out.print("Bezeichnung > ");
+                artikelID = eShop.sucheNachID(liesEingabe());
+                
+                if (artikelID == -1) {
+                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
+                    break;
+                }
+
 
                 System.out.println(
                         RED +
@@ -352,7 +394,7 @@ public class EShopClientCUI {
                 System.out.print("Passwort > ");
                 String benutzerPassword = liesEingabe();
 
-                eShop.getBenutzerVW().registrieren(
+                eShop.registrieren(
                             new Kunde(
                                     benutzerId,
                                     benutzerErkennung,
@@ -365,7 +407,7 @@ public class EShopClientCUI {
             }
 
             case "rm" -> {
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen neue Mitarbeiter registrieren.");
                     break;
                 }
@@ -385,7 +427,7 @@ public class EShopClientCUI {
                 String benutzerPassword = liesEingabe();
 
 
-                eShop.getBenutzerVW().registrieren(
+                eShop.registrieren(
                         new Mitarbeiter(
                                 benutzerId,
                                 benutzerErkennung,
@@ -398,7 +440,7 @@ public class EShopClientCUI {
             }
 
             case "l" -> {
-                if (eShop.getBenutzerVW().istEingeloggt()) {
+                if (eShop.istEingeloggt()) {
                     System.out.println(
                             "Ein Benutzer ist bereits eingeloggt."
                     );
@@ -412,7 +454,7 @@ public class EShopClientCUI {
                 System.out.print("Passwort > ");
                 String benutzerPassword = liesEingabe().trim();
 
-                boolean erfolg = eShop.getBenutzerVW().login(
+                boolean erfolg = eShop.login(
                         benutzerErkennung,
                         benutzerPassword
                 );
@@ -438,7 +480,7 @@ public class EShopClientCUI {
 
             case "o" -> {
 
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
 
                     System.out.println(
                             "Kein Benutzer ist eingeloggt."
@@ -456,7 +498,7 @@ public class EShopClientCUI {
 
                 if (antwort.equals("y")) {
 
-                    eShop.getBenutzerVW().logout();
+                    eShop.logout();
 
                     System.out.println(
                             GREEN + "✔ Logout erfolgreich." + RESET
@@ -478,12 +520,12 @@ public class EShopClientCUI {
 
             case "e" -> {
 
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
 
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen Ereignisse ansehen.");
                     break;
                 }
@@ -496,37 +538,19 @@ public class EShopClientCUI {
 
             case "es" -> {
 
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
+                if (!eShop.istEingeloggt()) {
                     System.out.println("Bitte zuerst einloggen.");
                     break;
                 }
 
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
+                if (!eShop.istMitarbeiter()) {
                     System.out.println("Nur Mitarbeiter dürfen Ereignisse speichern.");
                     break;
                 }
 
-                eShop.speichereEreignisseTXT();
+                eShop.speichereEreignisse();
 
                 System.out.println(GREEN + "✔ Ereignisse erfolgreich gespeichert." + RESET);
-            }
-
-
-            case "s" -> {
-
-                if (!eShop.getBenutzerVW().istEingeloggt()) {
-                    System.out.println("Bitte zuerst einloggen.");
-                    break;
-                }
-
-                if (!eShop.getBenutzerVW().istMitarbeiter()) {
-                    System.out.println("Nur Mitarbeiter dürfen Daten speichern.");
-                    break;
-                }
-
-                eShop.speichereArtikel();
-
-                System.out.println(GREEN + "✔ Artikeldaten erfolgreich gespeichert." + RESET);
             }
         }
     }
@@ -535,7 +559,10 @@ public class EShopClientCUI {
         if (artikelListe.isEmpty()) {
             System.out.println("Liste ist leer.");
         } else {
-            for (int i : artikelListe.keySet()) {
+            ArrayList<Integer> sortedIDs = new ArrayList<>(artikelListe.keySet());
+            Collections.sort(sortedIDs);
+
+            for (int i : sortedIDs) {
                 System.out.println(artikelListe.get(i) + " Menge: " + artikelMenge.get(i));
             }
         }
@@ -551,45 +578,29 @@ public class EShopClientCUI {
         }
     }
 
-    public void gibGekaufteAus(HashMap<Integer, Integer> warenkorbListe, HashMap<Integer, Artikel> artikelListe) {
-        if (warenkorbListe.isEmpty()) {
-            System.out.println("Warenkorb ist leer.");
-        } else {
-            int rechnung_width = 40;
-            float summe = 0;
-            double mwstSumme;
-            double gesamtpreis;
-            final double MWST = 0.19;
+    public void gibRechnungAus(Rechnung rechnung) {
+        int rechnung_width = 40;
 
-            LocalDate today = LocalDate.now();
-            String kundeName = eShop.aktuellerBenutzer().getBenutzerVorNachname();// mussen wir alle logic im eshop machen
+        System.out.println();
+        System.out.println(" ".repeat((rechnung_width - 8) / 2) + "Rechnung");
+        System.out.printf("%-10s %29s\n", rechnung.getHeutigesDatum(), rechnung.getKundeName());
+        System.out.println("-".repeat(rechnung_width));
 
-            System.out.println();
-            System.out.println(" ".repeat((rechnung_width - 8) / 2) + "Rechnung");
-            System.out.printf("%-10s %29s\n", today, kundeName);
-            System.out.println("-".repeat(rechnung_width));
-
-            for (Map.Entry<Integer, Integer> entry : warenkorbListe.entrySet()) {
-                Artikel curArt = artikelListe.get(entry.getKey());
-                System.out.printf(
-                        "%-11s %12s€ %13.2f€\n",
-                        curArt.getBezeichnung(),
-                        entry.getValue() + " × " + String.format("%.2f", curArt.getPreis()),
-                        curArt.getPreis() * entry.getValue()
-                );
-
-                summe += entry.getValue() * curArt.getPreis();
-            }
-
-            mwstSumme = MWST * summe;
-            gesamtpreis = mwstSumme + summe;
-
-            System.out.println("-".repeat(rechnung_width));
-            System.out.printf("%-11s %27.2f€\n", "Summe", summe);
-            System.out.printf("%-11s %27.2f€\n", "MWSt", mwstSumme);
-            System.out.printf("%-11s %27.2f€\n", "Gesamtpreis", gesamtpreis);
-
+        for (Map.Entry<Integer, Integer> entry : rechnung.gibWarenkorbListe().entrySet()) {
+            Artikel curArt = eShop.gibArtikelListe().get(entry.getKey());
+            System.out.printf(
+                    "%-11s %12s€ %13.2f€\n",
+                    curArt.getBezeichnung(),
+                    entry.getValue() + " × " + String.format("%.2f", curArt.getPreis()),
+                    curArt.getPreis() * entry.getValue()
+            );
         }
+
+        System.out.println("-".repeat(rechnung_width));
+        System.out.printf("%-11s %27.2f€\n", "Summe", rechnung.getSumme());
+        System.out.printf("%-11s %27.2f€\n", "MWSt", rechnung.getMwst());
+        System.out.printf("%-11s %27.2f€\n", "Gesamtpreis", rechnung.getGesamtPreis());
+
     }
 
     public void run() {

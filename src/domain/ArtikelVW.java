@@ -8,6 +8,7 @@ import persistence.PersistenceManager;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class ArtikelVW {
@@ -103,11 +104,24 @@ public class ArtikelVW {
         return artikelListe.get(artikelID);
     }
 
+    public int sucheNachIDMitBezeichnung(String bezeichnung) {
+        for (Artikel a : artikelListe.values()) {
+            if (Objects.equals(a.getBezeichnung(), bezeichnung))
+                return a.getArtikelID();
+        }
+
+        return -1;
+    }
+
     public HashMap<Integer, Artikel> gibArtikelListe() {
         return artikelListe;
     }
     
     public HashMap<Integer, Integer> gibArtikelMengeListe() {
         return artikelMengeListe;
+    }
+
+    public int gibBestand(int artikelID) {
+        return artikelMengeListe.get(artikelID);
     }
 }
