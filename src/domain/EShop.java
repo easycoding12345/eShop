@@ -90,7 +90,7 @@ public class EShop {
         );
 
         ereignisse.add(ereignis);
-
+        speichereEreignisse();
         speichereArtikel();
     }
 
@@ -144,7 +144,7 @@ public class EShop {
         );
 
         ereignisse.add(ereignis);
-
+        speichereEreignisse();
         speichereArtikel();
     }
 
@@ -212,7 +212,7 @@ public class EShop {
         );
 
         ereignisse.add(ereignis);
-
+        speichereEreignisse();
         speichereArtikel();
     }
 
@@ -233,7 +233,7 @@ public class EShop {
 
         Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Einlagerung", "k:" + kunde);
         ereignisse.add(ereignis);
-
+        speichereEreignisse();
         speichereArtikel();
     }
 
@@ -347,6 +347,7 @@ public class EShop {
         }
 
         speichereArtikel();
+        speichereEreignisse();
     }
 
     public boolean istMassengutartikel(int artikelID) {
