@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+
+// ok
+
 public class EShopClientCUI {
     private EShop eShop;
     private BufferedReader in;
