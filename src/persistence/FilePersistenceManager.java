@@ -198,7 +198,7 @@ public class FilePersistenceManager implements PersistenceManager {
     }
 
     @Override
-    public void speichereEreignisArtikel(ArrayList<Ereignis> ereignisse) throws IOException {
+    public void speichereEreignis(ArrayList<Ereignis> ereignisse) throws IOException {
 
         FileWriter fw = new FileWriter("Ereignisse.txt", false);
         PrintWriter pw = new PrintWriter(fw);

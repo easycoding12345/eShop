@@ -95,9 +95,9 @@ public class EShop {
             }
             historie.put(tag, bestand);
         }
-        return historie;
-        ereignisse = pm.ladeEreignisse();
 
+        ereignisse = pm.ladeEreignisse();
+        return historie;
     }
 
     public HashMap<Integer, Artikel> gibArtikelListe() {
@@ -145,75 +145,9 @@ public class EShop {
                 "m:" + mitarbeiter
         ));
 
-        pm.speichereEreignisArtikel(ereignisse);
+        pm.speichereEreignis(ereignisse);
         speichereArtikel();
     }
-        /*Artikel art = new Artikel(artikelID, bezeichnung, preis);
-        artikelVW.bestandErhoehen(artikelID, menge);
-        if (preis < 0) {
-            throw new IllegalArgumentException(
-                    "Preis darf nicht negativ sein."
-            );
-        }
-        if (menge <= 0) {
-            throw new IllegalArgumentException("Bestand muss positiv sein.");
-        }
-
-        ereignisse.add(new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                art,
-                menge,
-                "Einlagerung",
-                "m:" + mitarbeiter
-        ));
-
-        speichereArtikel();
-    }*/
-
-      /*  Artikel art = new Artikel(artikelID, bezeichnung, preis);
-        artikelVW.einfuegen(art, menge);
-
-        *//*
-         * Ereignis erzeugen:
-         * Einlagerung durch Mitarbeiter
-         *//*
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), art, menge, "Einlagerung", "m:" + mitarbeiter);
-    public void fuegeArtikelEin(
-            int artikelID,
-            String bezeichnung,
-            int menge,
-            float preis,
-            String mitarbeiter
-    ) throws IOException {
-
-        if (preis < 0) {
-            throw new UngueltigerPreisException(preis);
-        }
-
-        if (menge <= 0) {
-            throw new UngueltigeMengeException(menge);
-        }
-
-        Artikel art = new Artikel(
-                artikelID,
-                bezeichnung,
-                preis
-        );
-
-        artikelVW.einfuegen(art, menge);
-
-        Ereignis ereignis = new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                art,
-                menge,
-                "Einlagerung",
-                "m:" + mitarbeiter
-        );
-
-        ereignisse.add(ereignis);
-
-        speichereArtikel();
-    }*/
 
     public void fuegeMassengutartikelEin(
             int artikelID,
@@ -239,7 +173,6 @@ public class EShop {
                     packungGroesse
             );
         }
-    }*/
 
         if (menge % packungGroesse != 0) {
             throw new MassengutartikelmengeNichtTeilbarException(
@@ -397,7 +330,7 @@ public class EShop {
      */
     public void speichereEreignisse()
             throws IOException {
-        pm.speichereEreignisArtikel(ereignisse);
+        pm.speichereEreignis(ereignisse);
         speichereArtikel();
     }
 

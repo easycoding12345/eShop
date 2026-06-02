@@ -111,7 +111,7 @@ public class ArtikelVW {
     }
     //speicherArtikelEreigniss method
     public void speichereEreignisse() throws IOException {
-        pm.speichereEreignisArtikel(ereignisse);
+        pm.speichereEreignis(ereignisse);
     }
 
     public void bestandErhoehen(int artikelID, int menge) {

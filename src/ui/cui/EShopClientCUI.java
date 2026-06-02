@@ -1,6 +1,5 @@
 package ui.cui;
 
-import com.sun.jdi.request.InvalidRequestStateException;
 import domain.EShop;
 import domain.exceptions.*;
 import entities.Benutzer;
@@ -11,8 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-
-// ok
 
 public class EShopClientCUI {
     private EShop eShop;
@@ -41,10 +38,7 @@ public class EShopClientCUI {
             System.out.println("w  → Warenkorb ansehen");
             System.out.println("ak → Kaufen");
             System.out.println("o  → Logout");
-        }
-
-        // fuer Mitarbeiter
-        else if (eShop.istMitarbeiter()) {
+        } else if (eShop.istMitarbeiter()) {
 
             System.out.println("\n===== MITARBEITERMENÜ =====");
 
@@ -60,10 +54,7 @@ public class EShopClientCUI {
             System.out.println("rm → Neuen Mitarbeiter registrieren");
             System.out.println("s  → Daten speichern");
             System.out.println("o  → Logout");
-        }
-
-        // Person nicht eingeloggt
-        else {
+        } else { // Person nicht eingeloggt
 
             System.out.println("\n===== HAUPTMENUE =====");
 
@@ -150,8 +141,8 @@ public class EShopClientCUI {
                 catch (ArtikelExistiertBereitsException e) {
 
                     System.out.println(RED +
-                                    e.getMessage()
-                                    + RESET
+                            e.getMessage()
+                            + RESET
                     );
 
                     break;
@@ -159,11 +150,11 @@ public class EShopClientCUI {
 
                 System.out.print("Preis > ");
                 try {
-                preis = Float.parseFloat(liesEingabe());
+                    preis = Float.parseFloat(liesEingabe());
                 } catch (NumberFormatException e) {
                     System.out.println(RED +
-                                    "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
-                                    + RESET
+                            "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
+                            + RESET
                     );
                     break;
                 }
@@ -179,11 +170,11 @@ public class EShopClientCUI {
                 } else if (artikelTyp.equals("m")) {
                     System.out.print("Größe der Packung > ");
                     try {
-                    packungGroesse = Integer.parseInt(liesEingabe());
+                        packungGroesse = Integer.parseInt(liesEingabe());
                     } catch (NumberFormatException e) {
                         System.out.println(RED +
-                                        "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
-                                        + RESET
+                                "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
+                                + RESET
                         );
                         break;
                     }
@@ -191,11 +182,11 @@ public class EShopClientCUI {
                     System.out.println(YELLOW + "Der Bestand muss durch " + packungGroesse + " teilbar sein" + RESET);
                     System.out.print("> ");
                     try {
-                    bestand = Integer.parseInt(liesEingabe());
+                        bestand = Integer.parseInt(liesEingabe());
                     } catch (NumberFormatException e) {
                         System.out.println(RED +
-                                        "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
-                                        + RESET
+                                "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
+                                + RESET
                         );
                         break;
                     }
@@ -315,8 +306,8 @@ public class EShopClientCUI {
                     } catch (UngueltigeMengeException e) {
 
                         System.out.println(RED +
-                                        e.getMessage()
-                                        + RESET
+                                e.getMessage()
+                                + RESET
                         );
                     }
 
@@ -352,14 +343,14 @@ public class EShopClientCUI {
                         System.out.println("Geben Sie bitte die neue Menge der Artikel ein.");
 
                         System.out.println(YELLOW +
-                                        "Die neue Menge muss durch "
-                                        + eShop.getPackungGroesse(artikelID)
-                                        + " teilbar sein"
-                                        + RESET
+                                "Die neue Menge muss durch "
+                                + eShop.getPackungGroesse(artikelID)
+                                + " teilbar sein"
+                                + RESET
                         );
                         try {
-                        int neueMenge = Integer.parseInt(liesEingabe());
-                        //try {
+                            int neueMenge = Integer.parseInt(liesEingabe());
+                            //try {
 
                             eShop.bestandVeraendern(
                                     artikelID,
@@ -368,8 +359,8 @@ public class EShopClientCUI {
                             );
 
                             System.out.println(YELLOW +
-                                            "✔ Artikelbestand erfolgreich verändert."
-                                            + RESET
+                                    "✔ Artikelbestand erfolgreich verändert."
+                                    + RESET
                             );
                         } catch (NumberFormatException e) {
                             System.out.println(
@@ -405,10 +396,6 @@ public class EShopClientCUI {
                 }
 
                 System.out.print("Bezeichnung > ");
-                artikelID = eShop.sucheNachID(liesEingabe());
-
-                if (artikelID == -1) {
-                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
                 try {
                     artikelID = eShop.sucheNachID(liesEingabe());
                 } catch (ArtikelExistiertNichtException e) {
@@ -421,11 +408,11 @@ public class EShopClientCUI {
                     System.out.print("Menge der Artikel > ");
 
                     try {
-                    menge = Integer.parseInt(liesEingabe());
+                        menge = Integer.parseInt(liesEingabe());
                     } catch (NumberFormatException e) {
                         System.out.println(RED +
-                                        "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
-                                        + RESET);
+                                "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
+                                + RESET);
                         break;
                     }
 
@@ -471,9 +458,9 @@ public class EShopClientCUI {
 
                     System.out.print("> ");
                     try{
-                    menge = Integer.parseInt(liesEingabe());
+                        menge = Integer.parseInt(liesEingabe());
 
-                    aktuelleBenutzer = eShop.aktuellerBenutzer();
+                        aktuelleBenutzer = eShop.aktuellerBenutzer();
 
                         eShop.fuegeInWarenkorb(
                                 artikelID,
@@ -515,9 +502,6 @@ public class EShopClientCUI {
                 }
 
                 System.out.print("Bezeichnung > ");
-                artikelID = eShop.sucheNachID(liesEingabe());
-
-                System.out.print("Bezeichnung > ");
                 try {
                     artikelID = eShop.sucheNachID(liesEingabe());
                 } catch (ArtikelExistiertNichtException e) {
@@ -528,9 +512,9 @@ public class EShopClientCUI {
 
                 System.out.print("Menge der Artikel > ");
                 try {
-                menge = Integer.parseInt(liesEingabe());
+                    menge = Integer.parseInt(liesEingabe());
 
-                aktuelleBenutzer = eShop.aktuellerBenutzer();
+                    aktuelleBenutzer = eShop.aktuellerBenutzer();
 
                     eShop.loescheAusWarenkorb(artikelID, menge, aktuelleBenutzer.getBenutzerVorNachname());
                     System.out.println(YELLOW + "✔ Artikel wurde aus dem Warenkorb entfernt." + RESET);
@@ -625,10 +609,6 @@ public class EShopClientCUI {
                 }
 
                 System.out.print("Bezeichnung > ");
-                artikelID = eShop.sucheNachID(liesEingabe());
-
-                if (artikelID == -1) {
-                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
 
                 try {
                     artikelID = eShop.sucheNachID(liesEingabe());
@@ -641,17 +621,17 @@ public class EShopClientCUI {
                 System.out.print("Neuer Preis > ");
 
                 try{
-                preis = Float.parseFloat(liesEingabe());
-                eShop.preisVeraendern(artikelID, preis);
+                    preis = Float.parseFloat(liesEingabe());
+                    eShop.preisVeraendern(artikelID, preis);
 
-                System.out.println(YELLOW + "✔ Preis erfolgreich geändert." + RESET);
+                    System.out.println(YELLOW + "✔ Preis erfolgreich geändert." + RESET);
                 } catch (NumberFormatException e) {
                     System.out.println(RED +
-                                    "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
-                                    + RESET
+                            "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
+                            + RESET
                     );
 
-            } catch (UngueltigerPreisException e) {
+                } catch (UngueltigerPreisException e) {
                     System.out.println(RED + e.getMessage() + RESET);
                 }
             }
@@ -675,10 +655,6 @@ public class EShopClientCUI {
                 );
 
                 System.out.print("Bezeichnung > ");
-                artikelID = eShop.sucheNachID(liesEingabe());
-
-                if (artikelID == -1) {
-                    System.out.println(YELLOW + "Es gibt keinen solchen Artikel" + RESET); // TODO: Exception?
                 try {
                     artikelID = eShop.sucheNachID(liesEingabe());
                 } catch (ArtikelExistiertNichtException e) {
@@ -712,7 +688,6 @@ public class EShopClientCUI {
                     System.out.println(
                             YELLOW + "Löschvorgang abgebrochen." + RESET
                     );
-
                 }
             }
             case "r" -> {
@@ -753,25 +728,25 @@ public class EShopClientCUI {
                 System.out.print("Benutzer ID > ");
 
                 try {
-                int benutzerId = Integer.parseInt(liesEingabe());
-                System.out.print("Benutzername > ");
-                String benutzerErkennung = liesEingabe();
+                    int benutzerId = Integer.parseInt(liesEingabe());
+                    System.out.print("Benutzername > ");
+                    String benutzerErkennung = liesEingabe();
 
-                System.out.print("Vor- und Nachname > ");
-                String benutzerVorNachname = liesEingabe();
+                    System.out.print("Vor- und Nachname > ");
+                    String benutzerVorNachname = liesEingabe();
 
-                System.out.print("Passwort > ");
-                String benutzerPassword = liesEingabe();
+                    System.out.print("Passwort > ");
+                    String benutzerPassword = liesEingabe();
 
 
-                eShop.registrieren(
-                        new Mitarbeiter(
-                                benutzerId,
-                                benutzerErkennung,
-                                benutzerVorNachname,
-                                benutzerPassword
-                        )
-                );
+                    eShop.registrieren(
+                            new Mitarbeiter(
+                                    benutzerId,
+                                    benutzerErkennung,
+                                    benutzerVorNachname,
+                                    benutzerPassword
+                            )
+                    );
                 } catch (NumberFormatException e) {
                     System.out.println(
                             RED +
@@ -923,28 +898,21 @@ public class EShopClientCUI {
 
                 System.out.println("Bestandshistorie der letzten 30 Tage:");
                 historie.forEach((tag, bestandwert) ->
-                    System.out.println("Tag " + tag + ": " + bestandwert)
+                        System.out.println("Tag " + tag + ": " + bestandwert)
                 );
             }
 
         }
     }
 
-    private void gibArtikellisteAus(HashMap<Integer, Artikel> artikelListe) {
+    private void gibArtikellisteAus(HashMap<Integer, Artikel> artikelListe, HashMap<Integer, Integer> artikelMenge) {
         if (artikelListe.isEmpty()) {
             System.out.println("Liste ist leer.");
-            return;
-        }
-        /*ArrayList<Integer> ids = new ArrayList<>(artikelListe.keySet());
-        Collections.sort(ids);
-        for (int id : ids){
-            System.out.println(artikelListe.get(id) + "Menge: " + eShop.gibBestand(id));*/
-        else {
+        } else {
             ArrayList<Integer> sortedIDs = new ArrayList<>(artikelListe.keySet());
             Collections.sort(sortedIDs);
 
             for (int i : sortedIDs) {
-                System.out.println(artikelListe.get(i) + " Menge: " + eShop.gibBestand(i)); //artikelMenge.get(i)); razia chek
                 if (eShop.istMassengutartikel(i)) {
                     System.out.println(artikelListe.get(i) + " Gesamte Menge: " + artikelMenge.get(i));
                 } else {
@@ -979,10 +947,10 @@ public class EShopClientCUI {
 
         for (Rechnung.GekaufterArtikel gekaufterArtikel : rechnung.gibAlleGekaufteArtikel()) {
             System.out.printf(
-                        "%-11s %12s€ %13.2f€\n",
-                        gekaufterArtikel.bezeichnung(),
-                        gekaufterArtikel.menge() + " × " + String.format("%.2f", gekaufterArtikel.preis()),
-                        gekaufterArtikel.summe()
+                    "%-11s %12s€ %13.2f€\n",
+                    gekaufterArtikel.bezeichnung(),
+                    gekaufterArtikel.menge() + " × " + String.format("%.2f", gekaufterArtikel.preis()),
+                    gekaufterArtikel.summe()
             );
         }
 
