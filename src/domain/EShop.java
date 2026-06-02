@@ -129,12 +129,10 @@ public class EShop {
             artikelVW.bestandErhoehen(artikelID, menge);
         }
         if (preis < 0) {
-            throw new IllegalArgumentException(
-                    "Preis darf nicht negativ sein."
-            );
+            throw new UngueltigerPreisException(preis);
         }
         if (menge <= 0) {
-            throw new IllegalArgumentException("Bestand muss positiv sein.");
+            throw new UngueltigeMengeException(menge);
         }
 
         ereignisse.add(new Ereignis(
@@ -464,10 +462,6 @@ public class EShop {
 
     public Benutzer aktuellerBenutzer () {
         return benutzerVW.getAktuellerBenutzer();
-    }
-
-    public Object gibBestand(int id) {
-        return artikelVW.gibBestand(id);
     }
 
     public void pruefeArtikelExistiertBereits(String bezeichnung) {

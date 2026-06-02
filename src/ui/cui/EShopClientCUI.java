@@ -112,9 +112,7 @@ public class EShopClientCUI {
                 System.out.println("Einzelartikel oder Massengutartikel? [e/m]");
                 String artikelTyp = liesEingabe();
 
-                if (artikelTyp.equals("e")){
-                } else if (artikelTyp.equals("m")){
-                }else {
+                if (!artikelTyp.equals("e") && !artikelTyp.equals("m")) {
                     System.out.println(RED + "Ungultige Eingabbe. Bitte e oder m eingeben" + RESET);
                     break;
                 }
