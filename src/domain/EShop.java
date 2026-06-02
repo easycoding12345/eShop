@@ -256,6 +256,11 @@ public class EShop {
     }
 
     public void loescheAusWarenkorb(int artikelID, int menge, String kunde) throws IOException {
+
+        if (menge <= 0) {
+            throw new UngueltigeMengeException(menge);
+        }
+
         if (istMassengutartikel(artikelID)) {
             if (menge < getPackungGroesse(artikelID)) {
                 throw new MengeWenigerAlsPackungGroesseException(getArtikelName(artikelID), menge, getPackungGroesse(artikelID));
