@@ -93,55 +93,6 @@ public class BenutzerVW {
         return this.aktuellerBenutzer != null && this.aktuellerBenutzer.getRole().equals("Kunde");
     }
 
-    public void speicherBenutzer(Benutzer benutzer) {
-            try {
-                BufferedWriter writer = new BufferedWriter(new
-                        FileWriter("benutzer.txt", true));
-                int var10001 = benutzer.getBenutzerId();
-                writer.write(var10001 + ";" + benutzer.getBenutzerErkennung()
-                        + ";" + benutzer.getBenutzerVorNachname() + ";" +
-                        benutzer.getBenutzerPassword() + ";" + benutzer.getRole());
-                writer.newLine();
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-    }
-
-    // TODO: Jetzt es gibt das Problem, dass Kunde wird als Mitarbeiter gesehen, nachdem die Daten gelesen werden = done
-    public void ladeBenutzer() {
-        File file = new File(datei);
-        if (!file.exists()) {
-            System.out.println("Keine Benutzer Datei gefunden");
-        }
-        try {
-            BufferedReader reader;
-            String zeile;
-            String erkennung;
-            Benutzer benutzer = null;
-            for(reader = new BufferedReader(new FileReader("benutzer.txt")); (zeile = reader.readLine()) != null; this.benutzerMap.put(erkennung, benutzer)) {
-                String[] daten = zeile.split(";");
-                int id = Integer.parseInt(daten[0]);
-                nextId = Math.max(nextId, id + 1);
-                erkennung = daten[1];
-                String name = daten[2];
-                String password = daten[3].trim();
-                String rolle = daten[4].trim();
-                if (rolle.equalsIgnoreCase("kunde")) {
-                    benutzer = new Kunde(id, erkennung, name, password);
-                } else if(rolle.equalsIgnoreCase("mitarbeiter")) {
-                    benutzer = new Mitarbeiter(id, erkennung, name, password);
-                }else {
-                    System.out.println("Unbekannte Rolle:" + rolle);
-                }
-            }
-
-            reader.close();
-        } catch (Exception var10) {
-            System.out.println("keine Datei gefunfen.");
-        }
-    }
     //Id generiere method
     public int generiereId(){
         return nextId++;

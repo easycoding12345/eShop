@@ -133,30 +133,13 @@ public class ArtikelVW {
     }
 
     public void bestandVerringern(int artikelID, int menge) {
-
-        int current = artikelMengeListe.getOrDefault(artikelID,0);//check
-       if (artikelMengeListe.get(artikelID) > 0)
-            artikelMengeListe.put(artikelID, current - menge);
-        if (menge <= 0) return;
-
-        Artikel artikel = findeArtikel(artikelID);
-        if (artikel == null) return;
-
-        /*int current = artikelMengeListe.getOrDefault(artikelID,0);
-        if (current < menge){
-            System.out.println("nicht genug bestand");
-        }
-        artikelMengeListe.put(artikelID, current - menge);*/
-        addEreignis(new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                artikel,
-                menge, "AUSLAGERUNG", "system"));
         int bestand = artikelMengeListe.get(artikelID);
 
         if (bestand < menge) {
             throw new BestandNichtAusreichendException(artikelListe.get(artikelID).getBezeichnung(), bestand, menge);
         }
-            artikelMengeListe.put(artikelID, artikelMengeListe.get(artikelID) - menge);
+
+        artikelMengeListe.put(artikelID, artikelMengeListe.get(artikelID) - menge);
     }
 
     public void einfuegen(Artikel einArtikel, int menge) {

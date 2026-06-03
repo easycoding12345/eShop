@@ -43,10 +43,10 @@ public class EShop {
         pm = new FilePersistenceManager();
         //pm.speichereEreignisArtikel(ereignisse);
         //ereignisse = pm.ladeEreignisse();
-        ArrayList<Ereignis> geladen = pm.ladeEreignisse();
+        ArrayList<Ereignis> historieVon30Tagen = pm.ladeEreignisse();
         ereignisse = new ArrayList<>();
 
-        for (Ereignis e : geladen) {
+        for (Ereignis e : historieVon30Tagen) {
             Artikel real = artikelVW.findeArtikel(e.getArtikel().getArtikelID());
             if (real != null) {
                 ereignisse.add(new Ereignis(
@@ -61,42 +61,29 @@ public class EShop {
             }
         }
     }
+
     public Map<Integer, Integer> berechneBestandHistorie(int artikelID) {
-      /*  //methode fur ereignisse nach datum sortieren
-        ereignisse.sort(Comparator.comparingInt(Ereignis::getMenge));*/
+        int bestand = 0;
 
-        // methode fur letzte 30 tage
-        int heute = LocalDate.now().getDayOfYear();
-        int startTag = heute - 30;
-
-        //aktuele bestandsmenge
-        int bestand = artikelVW.gibBestand(artikelID);
+        List<Ereignis> events = ereignisse.stream().filter(e -> e.getArtikel().getArtikelID() == artikelID).toList();
 
         Map<Integer, Integer> historie = new HashMap<>();
 
-        // methode fur diesen artikel der letzte 30 tag
-        List<Ereignis> events = ereignisse.stream()
-                .filter(e -> e.getArtikel().getArtikelID() == artikelID)
-                .filter(e -> e.getTag() >= startTag)
-                .sorted(Comparator.comparingInt(Ereignis::getTag).reversed()) // rückwärts
-                .toList();
-
-        // ruckwarts durch der tag gehen
-        for (int tag = heute; tag > startTag; tag--) {
-            for (Ereignis e : events) {
-                if (e.getTag() == tag) {
-                    if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")) {
-                        bestand -= e.getMenge();
-                    } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
-                        bestand += e.getMenge();
-
-                    }
-                }
+        int counter = 0;
+        for (Ereignis e : events) {
+            if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")) {
+                bestand += e.getMenge();
+            } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
+                bestand -= e.getMenge();
             }
-            historie.put(tag, bestand);
+            if (counter == 30) {
+                break;
+            }
+            historie.put(e.getTag(), bestand);
+            counter += 1;
         }
 
-        ereignisse = pm.ladeEreignisse();
+
         return historie;
     }
 
@@ -264,20 +251,6 @@ public class EShop {
                 "Auslagerung",
                 "k:" + kunde
         ));
-        /*warenkorbVW.einfuegen(artikelID, menge);
-        artikelVW.loeschen(artikelID, menge);
-
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
-        ereignisse.add(ereignis);*/
-        Ereignis ereignis = new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                artikelVW.findeArtikel(artikelID),
-                menge,
-                "Auslagerung",
-                "k:" + kunde
-        );
-
-        ereignisse.add(ereignis);
 
         speichereArtikel();
     }

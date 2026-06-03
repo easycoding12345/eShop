@@ -136,6 +136,10 @@ public class FilePersistenceManager implements PersistenceManager {
                 while ((line = reader.readLine()) != null) {
                     String[] parts = line.split(";");
 
+                    if (line.isEmpty()) {
+                        continue;
+                    }
+
                     int tag = Integer.parseInt(parts[0]);
                     String typ = parts[1];
                     int artikelID = Integer.parseInt(parts[2]);
