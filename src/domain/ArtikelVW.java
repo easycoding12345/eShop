@@ -1,16 +1,12 @@
 package domain;
 
-import domain.exceptions.ArtikelExistiertBereitsException;
 import domain.exceptions.BestandNichtAusreichendException;
 import entities.Artikel;
-import entities.Ereignis;
 import entities.Massengutartikel;
 import persistence.FilePersistenceManager;
 import persistence.PersistenceManager;
-import java.time.LocalDate;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -20,34 +16,6 @@ public class ArtikelVW {
     private HashMap<Integer, Artikel> artikelListe = new HashMap<>();
     private HashMap<Integer, Integer> artikelMengeListe = new HashMap<>();
     private PersistenceManager pm = new FilePersistenceManager();
-
-
-    //bestandHistorie
-    public void ladeEreignisse() {
-        ArrayList<Ereignis> geladene = pm.ladeEreignisse();
-        ereignisse.clear();
-        ereignisse.addAll(geladene);
-    }
-
-    private final ArrayList<Ereignis> ereignisse = new ArrayList<>();
-
-    public void addEreignis(Ereignis e) {
-        ereignisse.add(e);
-    }
-    public int berechneBestand(int artikelID){
-        int bestand =0;
-
-        for(Ereignis e: ereignisse){
-            if (e.getArtikel().getArtikelID() == artikelID){
-                if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")){
-                    bestand += e.getMenge();
-                } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
-                  bestand -= e.getMenge();
-                }
-            }
-        }
-        return bestand;
-    }
 
     public void ladeArtikelMengeDaten (String datei) throws IOException {
         String dateiAM = datei+"_AM.txt";
@@ -61,31 +29,12 @@ public class ArtikelVW {
 
        Artikel einArtikel;
        while ((einArtikel = pm.ladeArtikel()) != null) {
-           int menge = artikelMengeListe.getOrDefault(einArtikel.getArtikelID(), 0);
            artikelListe.put(einArtikel.getArtikelID(), einArtikel);
        }
 
        pm.close();
    }
-        /*pm.openForReading(datei);
 
-        Artikel einArtikel;
-
-        do {
-            einArtikel = pm.ladeArtikel();
-
-            if (einArtikel != null) {
-                Integer mengeObj = artikelMengeListe.get(einArtikel.getArtikelID());
-                int menge = (mengeObj != null) ? mengeObj : 0;
-                try {
-                    einfuegen(einArtikel, menge);
-                    //einfuegen(einArtikel, artikelMengeListe.get(einArtikel.getArtikelID()));
-                } catch (ArtikelExistiertBereitsException e1) {}
-            }
-        } while (einArtikel != null);
-
-        pm.close();
-    }*/
     public void speichereArtikelMengeDaten(String datei) throws IOException {
         pm.openForWriting(datei);
 
@@ -109,27 +58,13 @@ public class ArtikelVW {
         // Persistenz-Schnittstelle wieder schließen
         pm.close();
     }
-    //speicherArtikelEreigniss method
-    public void speichereEreignisse() throws IOException {
-        pm.speichereEreignis(ereignisse);
-    }
 
     public void bestandErhoehen(int artikelID, int menge) {
-
         int current = artikelMengeListe.getOrDefault(artikelID,0);//check
-       artikelMengeListe.put(artikelID, current + menge);//check
+        artikelMengeListe.put(artikelID, current + menge);//check
         Artikel artikel = findeArtikel(artikelID);
         if (artikel == null || menge <= 0 )
             return;
-
-       /*
-        int current = artikelMengeListe.getOrDefault(artikelID,0);
-        artikelMengeListe.put(artikelID, current + menge);*/
-        addEreignis(new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                artikel,
-                menge, "EINLAGERUNG", "system"
-        ));
     }
 
     public void bestandVerringern(int artikelID, int menge) {
@@ -149,21 +84,8 @@ public class ArtikelVW {
        else {
             artikelListe.put(einArtikel.getArtikelID(), einArtikel);
             artikelMengeListe.put(einArtikel.getArtikelID(), Math.max(menge, 0));
-            addEreignis(
-                    new Ereignis(LocalDate.now().getDayOfYear(),
-                            einArtikel,
-                            menge,
-                            "EINLAGERUNG",
-                            "system"
-                    )
-                );
            }
         }
-
-
-    public void loeschen(int artikelID, int menge) {
-        bestandVerringern(artikelID, menge);
-    }
 
     public void bezeichnungVeraendern(int artikelID, String bezeichnung) {
         artikelListe.get(artikelID).setBezeichnung(bezeichnung);
@@ -191,20 +113,16 @@ public class ArtikelVW {
         return -1;
     }
 
+    public Artikel findeArtikelMitBezeichnung(String bezeichnung) {
+        return findeArtikel(sucheNachIDMitBezeichnung(bezeichnung));
+    }
+
     public HashMap<Integer, Artikel> gibArtikelListe() {
         return artikelListe;
     }
     
     public HashMap<Integer, Integer> gibArtikelMengeListe() {
         return artikelMengeListe;
-    }
-    //hier habe ich einbischen veranderungen gemacht
-    public int gibBestand(int artikelID) {
-        return artikelMengeListe.getOrDefault(artikelID, 0);
-        /*Artikel a = findeArtikel(artikelID);
-        if (a == null) return 0;
-        return berechneBestand(artikelID);*/
-
     }
 
     public int getBestand(int artikelID) {

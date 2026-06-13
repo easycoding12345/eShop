@@ -1,0 +1,87 @@
+package domain;
+
+import entities.Artikel;
+import entities.Ereignis;
+import persistence.FilePersistenceManager;
+import persistence.PersistenceManager;
+
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+public class EreignisVW {
+    private PersistenceManager pm = new FilePersistenceManager();
+    ArrayList<Ereignis> ereignisListe = new ArrayList<>();
+
+    public void ladeEreignisse(String datei, Function<String, Artikel> findeArtikelMitBezeichnung) throws IOException {
+        pm.openForReading(datei);
+        ArrayList<PersistenceManager.einEreignisInfo> gespeichertEreignisListe = pm.ladeEreignisse();
+        pm.close();
+
+        for (PersistenceManager.einEreignisInfo einEreignis : gespeichertEreignisListe) {
+            Artikel artikel = findeArtikelMitBezeichnung.apply(einEreignis.bezeichnung());
+
+            ereignisListe.add(new Ereignis(
+                    einEreignis.date(),
+                    artikel,
+                    einEreignis.menge(),
+                    einEreignis.typ(),
+                    einEreignis.person()
+            ));
+        }
+    }
+
+    public void speichereEreignisse() throws IOException {
+        pm.speichereEreignis(ereignisListe);
+    }
+
+    public void addEreignis(Artikel einArtikel, int menge, String typ, String person) throws IOException {
+        ereignisListe.add(new Ereignis(
+                LocalDate.now().toString(),
+                einArtikel,
+                menge,
+                typ,
+                person
+        ));
+
+        speichereEreignisse();
+    }
+
+    public ArrayList<Ereignis> gibEreignisListe() {
+        return ereignisListe;
+    }
+
+    public Map<String, Integer> gibBestandHistorie(int artikelID) {
+        int bestand = 0;
+
+        List<Ereignis> events = ereignisListe.stream().filter(e -> e.getArtikel().getArtikelID() == artikelID).toList();
+
+        Map<String, Integer> historie = new HashMap<>();
+
+        int counter = 0;
+        for (Ereignis e : events) {
+            if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")) {
+                bestand += e.getMenge();
+            } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
+                bestand -= e.getMenge();
+            }
+            if (counter == 30) {
+                break;
+            }
+            historie.put(e.getTag(), bestand);
+            counter += 1;
+        }
+
+
+        return historie;
+    }
+}
+
+
+
+

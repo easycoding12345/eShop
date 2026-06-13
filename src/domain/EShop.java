@@ -24,9 +24,8 @@ public class EShop {
 
     // TODO: Sollen sie alle final sein?
     private ArtikelVW artikelVW;
-    private BenutzerVW benutzerVW = new BenutzerVW();
-    private ArrayList<Ereignis> ereignisse;// Liste aller ereignisse
-    private PersistenceManager pm;
+    private BenutzerVW benutzerVW;
+    private EreignisVW ereignisVW;
 
     public BenutzerVW getBenutzerVW() {
         return benutzerVW;
@@ -39,52 +38,9 @@ public class EShop {
         artikelVW = new ArtikelVW();
         artikelVW.ladeArtikelMengeDaten(datei);
         warenkorbVW = new WarenkorbVW();
-        ereignisse = new ArrayList<>();
-        pm = new FilePersistenceManager();
-        //pm.speichereEreignisArtikel(ereignisse);
-        //ereignisse = pm.ladeEreignisse();
-        ArrayList<Ereignis> historieVon30Tagen = pm.ladeEreignisse();
-        ereignisse = new ArrayList<>();
-
-        for (Ereignis e : historieVon30Tagen) {
-            Artikel real = artikelVW.findeArtikel(e.getArtikel().getArtikelID());
-            if (real != null) {
-                ereignisse.add(new Ereignis(
-                        e.getTag(),
-                        real,
-                        e.getMenge(),
-                        e.getTyp(),
-                        e.getPerson()
-                ));
-            } else {
-                ereignisse.add(e);
-            }
-        }
-    }
-
-    public Map<Integer, Integer> berechneBestandHistorie(int artikelID) {
-        int bestand = 0;
-
-        List<Ereignis> events = ereignisse.stream().filter(e -> e.getArtikel().getArtikelID() == artikelID).toList();
-
-        Map<Integer, Integer> historie = new HashMap<>();
-
-        int counter = 0;
-        for (Ereignis e : events) {
-            if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")) {
-                bestand += e.getMenge();
-            } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
-                bestand -= e.getMenge();
-            }
-            if (counter == 30) {
-                break;
-            }
-            historie.put(e.getTag(), bestand);
-            counter += 1;
-        }
-
-
-        return historie;
+        benutzerVW = new BenutzerVW();
+        ereignisVW = new EreignisVW();
+        ereignisVW.ladeEreignisse("Ereignisse.txt", artikelVW::findeArtikelMitBezeichnung);
     }
 
     public HashMap<Integer, Artikel> gibArtikelListe() {
@@ -97,11 +53,6 @@ public class EShop {
 
     public HashMap<Integer, Integer> gibWarenkorb() {
         return warenkorbVW.gibWarenkorb();
-    }
-
-    //Gibt die Ereignisse zurück
-    public ArrayList<Ereignis> gibEreignissen() {
-        return ereignisse;
     }
 
 
@@ -122,15 +73,8 @@ public class EShop {
             throw new UngueltigeMengeException(menge);
         }
 
-        ereignisse.add(new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                art,
-                menge,
-                "Einlagerung",
-                "m:" + mitarbeiter
-        ));
+        ereignisVW.addEreignis(art, menge, "Einlagerung", "m:" + mitarbeiter);
 
-        pm.speichereEreignis(ereignisse);
         speichereArtikel();
     }
 
@@ -175,16 +119,7 @@ public class EShop {
         );
 
         artikelVW.einfuegen(art, menge);
-
-        Ereignis ereignis = new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                art,
-                menge,
-                "Einlagerung",
-                "m:" + mitarbeiter
-        );
-
-        ereignisse.add(ereignis);
+        ereignisVW.addEreignis(art, menge, "Einlagerung", "m:" + mitarbeiter);
 
         speichereArtikel();
     }
@@ -243,16 +178,10 @@ public class EShop {
 
         warenkorbVW.einfuegen(artikelID, menge);
         artikelVW.bestandVerringern(artikelID, menge);
-
-        ereignisse.add(new Ereignis(
-                LocalDate.now().getDayOfYear(),
-                artikelVW.findeArtikel(artikelID),
-                menge,
-                "Auslagerung",
-                "k:" + kunde
-        ));
+        ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
 
         speichereArtikel();
+        
     }
 
     public void loescheAusWarenkorb(int artikelID, int menge, String kunde) throws IOException {
@@ -274,40 +203,15 @@ public class EShop {
         Artikel einArtikel = artikelVW.gibArtikelListe().get(artikelID);
         warenkorbVW.loeschen(artikelID, menge);
         artikelVW.einfuegen(einArtikel, menge);
+        ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), menge, "Einlagerung", "k:" + kunde);
 
-        Ereignis ereignis = new Ereignis(LocalDate.now().getDayOfYear(), artikelVW.findeArtikel(artikelID), menge, "Einlagerung", "k:" + kunde);
-        ereignisse.add(ereignis);
 
         speichereArtikel();
+        
     }
 
     public void zuruecksetzeWarenkorb() {
         warenkorbVW.zuruecksetzen();
-    }
-
-    /*
-     * Gibt alle Ereignisse aus
-     */
-    public void gibEreignisseAus() {
-
-        // Prüfen ob Liste leer ist
-        if (ereignisse.isEmpty()) {
-            System.out.println("Keine Ereignisse vorhanden.");
-        } else {
-            // Alle Ereignisse ausgeben
-            for (Ereignis e : ereignisse) {
-                System.out.println(e);
-            }
-        }
-    }
-
-    /*
-     * Speichert alle Ereignisse in einer TXT-Datei
-     */
-    public void speichereEreignisse()
-            throws IOException {
-        pm.speichereEreignis(ereignisse);
-        speichereArtikel();
     }
 
     public void speichereArtikel() throws IOException {
@@ -356,22 +260,12 @@ public class EShop {
         int aktuellerBestand = artikelVW.getBestand(artikelID);
 
         if (aktuellerBestand < neuerBestand) {
-
             artikelVW.bestandErhoehen(
                     artikelID,
                     neuerBestand - aktuellerBestand
             );
 
-            Ereignis ereignis = new Ereignis(
-                    LocalDate.now().getDayOfYear(),
-                    artikelVW.findeArtikel(artikelID),
-                    neuerBestand - aktuellerBestand,
-                    "Einlagerung",
-                    "m:" + mitarbeiter
-            );
-
-            ereignisse.add(ereignis);
-
+            ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), neuerBestand - aktuellerBestand, "Einlagerung", "m:" + mitarbeiter);
         } else {
 
             artikelVW.bestandVerringern(
@@ -379,18 +273,11 @@ public class EShop {
                     aktuellerBestand - neuerBestand
             );
 
-            Ereignis ereignis = new Ereignis(
-                    LocalDate.now().getDayOfYear(),
-                    artikelVW.findeArtikel(artikelID),
-                    aktuellerBestand - neuerBestand,
-                    "Auslagerung",
-                    "m:" + mitarbeiter
-            );
-
-            ereignisse.add(ereignis);
+            ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), aktuellerBestand - neuerBestand, "Auslagerung", "m:" + mitarbeiter);
         }
 
         speichereArtikel();
+        
     }
 
     public boolean istMassengutartikel(int artikelID) {
@@ -452,5 +339,13 @@ public class EShop {
 
             throw new ArtikelExistiertBereitsException(artikel, "");
         }
+    }
+
+    public ArrayList<Ereignis> gibEreignisListe() {
+        return ereignisVW.gibEreignisListe();
+    }
+
+    public Map<String, Integer> berechneBestandHistorie(int artikelID) {
+        return ereignisVW.gibBestandHistorie(artikelID);
     }
 }

@@ -1,7 +1,4 @@
-128;Einlagerung;1;3;m:Tim Banner
-135;Auslagerung;1;1;k:Razia
-129;Einlagerung;6;10;m:Tim Banner
-142;Auslagerung;1;1;k:Maximilian
-145;Auslagerung;6;7;k:Razia
-154;Auslagerung;1;1;k:Razia
-154;Einlagerung;14;12;m:Tim Banner
+Tag: 2026-06-13 | Typ: Einlagerung | Artikel: Stuhl | Menge: 60 | Person: m:Tim Banner
+Tag: 2026-06-13 | Typ: Auslagerung | Artikel: SSD 1TB | Menge: 23 | Person: k:razia hadya
+Tag: 2026-06-13 | Typ: Auslagerung | Artikel: hose | Menge: 4 | Person: k:razia hadya
+Tag: 2026-06-13 | Typ: Auslagerung | Artikel: hose | Menge: 2 | Person: k:razia hadya
