@@ -79,7 +79,6 @@ public class BestandsHistorieGraph extends JPanel {
             g.drawLine(padding - 5, y, padding, y);
 
             g.drawString(String.valueOf(value), padding - 35, y + 5);
-
         }
     }
 }

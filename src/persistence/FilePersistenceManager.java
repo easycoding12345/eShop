@@ -19,10 +19,9 @@ public class FilePersistenceManager implements PersistenceManager {
     @Override
     public Map<String, Benutzer> ladeBenutzer() throws DateiNichtGefundenException{
         Map<String, Benutzer> map = new HashMap<>();
-        File file = new File("benutzer.txt");
-        if (!file.exists()) {
-            return map;
-        }try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        openForReading("benutzer.txt"); //TODO: sollte nicht hardcoded sein
+
+        try {
             String zeile;
             while ((zeile = reader.readLine()) != null) {
                 String[] d = zeile.split(";");
@@ -40,11 +39,10 @@ public class FilePersistenceManager implements PersistenceManager {
                 }
                 map.put(erkennung, b);
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new DateiNichtGefundenException(e.getMessage(), e.getCause());
         }
+
         return map;
     }
 
@@ -86,9 +84,7 @@ public class FilePersistenceManager implements PersistenceManager {
         }
 
         int artikelID = Integer.parseInt(artikelIDString);
-
         String bezeichnung = liesZeile();
-
         String preisString = liesZeile();
         float preis = Float.parseFloat(preisString);
 
@@ -176,18 +172,14 @@ public class FilePersistenceManager implements PersistenceManager {
 
     //benutzer speicherung
     @Override
-    public void speicherBenutzer(Benutzer benutzer) throws IOException {
-        try (BufferedWriter writer =
-                     new BufferedWriter(new FileWriter("benutzer.txt", true))) {
-            writer.write(
-                    benutzer.getBenutzerId() + ";" +
-                            benutzer.getBenutzerErkennung() + ";" +
-                            benutzer.getBenutzerVorNachname() + ";" +
-                            benutzer.getBenutzerPassword() + ";" +
-                            benutzer.getRole()
-            );
-            writer.newLine();
-        }
+    public void speicherBenutzer(Benutzer benutzer) throws DateiNichtGefundenException {
+        schreibeZeile(
+                benutzer.getBenutzerId() + ";" +
+                        benutzer.getBenutzerErkennung() + ";" +
+                        benutzer.getBenutzerVorNachname() + ";" +
+                        benutzer.getBenutzerPassword() + ";" +
+                        benutzer.getRole()
+        );
     }
 
     private String liesZeile() throws DateiNichtGefundenException {
