@@ -3,6 +3,7 @@ package ui.gui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 
 
@@ -10,7 +11,6 @@ public class mitarbeiterMainPanel extends JPanel {
     private JLabel mitarbeiterLabel;
     private JComboBox <String> aktionenComboBox;
     private JTextField sucheField;
-    private JButton suchenButton;
     private JButton logoutButton;
     private JButton loschenButton;
     private JTable ereignisTable;
@@ -59,8 +59,6 @@ public class mitarbeiterMainPanel extends JPanel {
     suchpanel.add(new JLabel("Artikel suchen:"));
     sucheField = new JTextField(15);
     suchpanel.add(sucheField);
-    suchenButton = new JButton("Suchen");
-    suchpanel.add(suchenButton);
     toolbarPanel.add(suchpanel, BorderLayout.EAST);
 
     northPanel.add(toolbarPanel, BorderLayout.SOUTH);
@@ -101,10 +99,6 @@ public class mitarbeiterMainPanel extends JPanel {
         return logoutButton;
     }
 
-    public JButton getSuchenButton() {
-        return suchenButton;
-    }
-
     public JTextField getSucheField() {
         return sucheField;
     }
@@ -128,5 +122,20 @@ public class mitarbeiterMainPanel extends JPanel {
 
     public DefaultTableModel getEreignisModel() {
         return ereignisModel;
+    }
+
+    public void filtereArtikel(String suchbegriff) {
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(artikelTabelleModel);
+        artikelTabelle.setRowSorter(sorter);
+        if (suchbegriff == null || suchbegriff.isBlank()) {
+            sorter.setRowFilter(null);
+        } else {
+            sorter.setRowFilter(
+                    RowFilter.regexFilter(
+                            "(?i)" + suchbegriff,
+                            1 // Spalte "Bezeichnung"
+                    )
+            );
+        }
     }
 }

@@ -130,26 +130,10 @@ public class EShopGUI extends JFrame {
             artikelLoschen();
         });
 
-        //such panel mitarbeiter
-        mitarbeiterMainPanel.getSuchenButton().addActionListener(e -> {
-            String query = mitarbeiterMainPanel.getSucheField().getText().trim().toLowerCase();
-            if (query.isEmpty()){
-                ladeArtikelTabelle();
-                return;
-            }
-           DefaultTableModel model = mitarbeiterMainPanel.getArtikelTabelleModel();
-            model.setRowCount(0);
-            for (int id : eShop.gibArtikelListe().keySet()){
-                Artikel a = eShop.gibArtikelListe().get(id);
-                if (a.getBezeichnung().toLowerCase().contains(query)){
-                    model.addRow(new Object[]{
-                            a.getArtikelID(),
-                            a.getBezeichnung(),
-                            eShop.gibArtikelMengeListe().get(id),
-                            a.getPreis()
-                    });
-                }
-            }
+        mitarbeiterMainPanel.getSucheField().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
         });
 
         //logout fur mitarbeiter
@@ -231,16 +215,12 @@ public class EShopGUI extends JFrame {
             cardLayout.show(mainPanel, "LOGIN");
         });
 
-        // Artikelsuche
-        kundenPanel.getSuchenButton().addActionListener(e -> {
-            String suchbegriff = kundenPanel.getSucheField().getText();
-            kundenPanel.filtereArtikel(suchbegriff);
+        kundenPanel.getSucheField().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText()); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText()); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText()); }
         });
-
-        kundenPanel.getSucheField().addActionListener(e -> {
-            kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText());
-        });
-
+        
         // Ausgewählten Artikel in den Warenkorb legen
         kundenPanel.getInWarenkorbButton().addActionListener(e -> {
 

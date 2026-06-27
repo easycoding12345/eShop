@@ -18,9 +18,6 @@ public class KundenPanel extends JPanel {
     // Suchfeld
     private JTextField sucheField;
 
-    // Suchbutton
-    private JButton suchenButton;
-
     // Logout-Button
     private JButton logoutButton;
 
@@ -59,8 +56,6 @@ public class KundenPanel extends JPanel {
         searchPanel.add(new JLabel("Suche nach Bezeichnung:"));
         sucheField = new JTextField(20);
         searchPanel.add(sucheField);
-        suchenButton = new JButton("\uD83D\uDD0D Suchen");
-        searchPanel.add(suchenButton);
 
 // Button zum Hinzufügen eines Artikels
         inWarenkorbButton = new JButton("➕ In Warenkorb");
@@ -143,10 +138,6 @@ public class KundenPanel extends JPanel {
 
     public JTextField getSucheField() {
         return sucheField;
-    }
-
-    public JButton getSuchenButton() {
-        return suchenButton;
     }
 
     public JButton getLogoutButton() {
