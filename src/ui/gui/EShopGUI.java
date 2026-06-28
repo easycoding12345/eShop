@@ -74,44 +74,6 @@ public class EShopGUI extends JFrame {
         mitarbeiterLoginPanel = new mitarbeiterLoginPanel();
         mitarbeiterMainPanel = new mitarbeiterMainPanel();
 
-        //COMBOX ACTION
-        mitarbeiterMainPanel.getAktionenComboBox().addActionListener(e -> {
-                    String aktionen = (String) mitarbeiterMainPanel
-                            .getAktionenComboBox().getSelectedItem();
-                    switch (aktionen) {
-                        case "Artikel ansehen":
-                            ladeArtikelTabelle();
-                            break;
-                        case "neue Artikel im Katalog hinzufügen":
-                            artikelHinzufuegenDialog();
-                            break;
-                        case "Bezeichnung ändern":
-                           bezeichnungVerandern();
-                            break;
-                        case "Artikel aus dem Katalog koplett löschen":
-                            artikelLoschen();
-                            break;
-                        case "Bestand ändern":
-                            bestandVerandernDialog();
-                            break;
-                        case "Preis ändern":
-                            preisAndernDialog();
-                            break;
-                        case "Ereignisse ansehen":
-                            System.out.println(eShop.gibArtikelListe().size());
-                             zeigeEreignisseTabelle();
-                            break;
-                        case "Bestandhistorie anzeigen":
-                           bestandHistorieDialog();
-                            break;
-                        case "neue Mitarbeiter registrieren":
-                           mitarbeiterRegistrierenDialog();
-                            break;
-
-                    }
-
-                });
-
 
         // PANELS ZUM CARDLAYOUT HINZUFÜGEN
         mainPanel.add(loginPanel, "LOGIN");
@@ -125,15 +87,45 @@ public class EShopGUI extends JFrame {
         // CardLayout in das Fenster einfügen
         add(mainPanel, BorderLayout.CENTER);
 
-        //artikel loschen
-        mitarbeiterMainPanel.getLoschenButton().addActionListener(e ->{
-            artikelLoschen();
-        });
-
         mitarbeiterMainPanel.getSucheField().getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void insertUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
             public void removeUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { mitarbeiterMainPanel.filtereArtikel(mitarbeiterMainPanel.getSucheField().getText().trim()); }
+        });
+
+        mitarbeiterMainPanel.getArtikelHinzufuegenButton().addActionListener(e -> {
+            artikelHinzufuegenDialog();
+        });
+
+        mitarbeiterMainPanel.getArtikelVeraendernButton().addActionListener(e -> {
+            JTable table = mitarbeiterMainPanel.getArtikelTabelle();
+            int selectedRow = table.getSelectedRow();
+
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this,
+                        "Bitte wählen Sie zuerst einen Artikel aus der Tabelle aus!",
+                        "Kein Artikel ausgewählt",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int modelRow = table.convertRowIndexToModel(selectedRow);
+            int artikelID = Integer.parseInt(table.getModel().getValueAt(modelRow, 0).toString());
+
+            ArtikelVeraendernDialog dialog = new ArtikelVeraendernDialog(this, eShop, () -> ladeArtikelTabelle(), artikelID);
+            dialog.setVisible(true);
+        });
+
+        mitarbeiterMainPanel.getHistorieButton().addActionListener(e -> {
+            bestandHistorieDialog();
+        });
+
+        mitarbeiterMainPanel.getEreignisseButton().addActionListener(e -> {
+            zeigeEreignisseTabelle();
+        });
+
+        mitarbeiterMainPanel.getMitarbeiterRegButton().addActionListener(e -> {
+            mitarbeiterRegistrierenDialog();
         });
 
         //logout fur mitarbeiter
@@ -220,7 +212,7 @@ public class EShopGUI extends JFrame {
             public void removeUpdate(javax.swing.event.DocumentEvent e) { kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText()); }
             public void changedUpdate(javax.swing.event.DocumentEvent e) { kundenPanel.filtereArtikel(kundenPanel.getSucheField().getText()); }
         });
-        
+
         // Ausgewählten Artikel in den Warenkorb legen
         kundenPanel.getInWarenkorbButton().addActionListener(e -> {
 
@@ -472,185 +464,7 @@ public class EShopGUI extends JFrame {
             }
         }
     }
-    //artikel loschen auf dem tablle
-    private void artikelLoschen(){
-        String bezeichnung = JOptionPane.showInputDialog(this,
-                "Gib Bezeinung des Artikels");
-        if (bezeichnung == null || bezeichnung.trim().isEmpty()) {
-            return;
-        }
-        bezeichnung = bezeichnung.trim();
-        Integer artikelIdGefunden = null;
-        for (int id : eShop.gibArtikelListe().keySet()) {
-            Artikel a = eShop.gibArtikelListe().get(id);
-            if (a.getBezeichnung().equalsIgnoreCase(bezeichnung)) {
-                artikelIdGefunden= id;
-                break;
-            }
-        }
-        if (artikelIdGefunden == null) {
-            JOptionPane.showMessageDialog(this, "Artikel nicht gefunden!");
-            return;
-        }
-        try {
-            eShop.artikelVernichten(artikelIdGefunden);
-            ladeArtikelTabelle();
-            JOptionPane.showMessageDialog(this, "Artikel wurde erfolgreich gelöscht!");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Fehler beim Löschen!");
-        }
-    }
-    private void bezeichnungVerandern(){
-        JPanel panelBezeichnung = new JPanel(new BorderLayout(5,5));
-        JTextField bezeichnungSuchField = new JTextField();
-        DefaultComboBoxModel <String> model = new DefaultComboBoxModel<>();
-        JComboBox<String> artikelBox = new JComboBox<>(model);
 
-        for (int id : eShop.gibArtikelListe().keySet()) {
-            Artikel a = eShop.gibArtikelListe().get(id);
-            model.addElement(id + "-" + a.getBezeichnung());
-            //suche im bv bereich
-            bezeichnungSuchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-                private void filter(){
-                    String texte = bezeichnungSuchField.getText().trim().toLowerCase();
-                    model.removeAllElements();
-                    for (int id : eShop.gibArtikelListe().keySet()) {
-                        Artikel a = eShop.gibArtikelListe().get(id);
-                        if (String.valueOf(id).contains(texte) || a.getBezeichnung().toLowerCase().contains(texte)){
-                            model.addElement(id + "-" + a.getBezeichnung());
-                        }
-                    }
-                }
-                public void insertUpdate(javax.swing.event.DocumentEvent e) {filter();}
-                public void removeUpdate(javax.swing.event.DocumentEvent e) {filter();}
-                public void changedUpdate(javax.swing.event.DocumentEvent e) {filter();}
-            });
-            panelBezeichnung.add(new JLabel("Suche bein Id oder Bezeichnung:"),BorderLayout.NORTH);
-            panelBezeichnung.add(bezeichnungSuchField, BorderLayout.CENTER);
-            panelBezeichnung.add(artikelBox, BorderLayout.SOUTH);
-
-            int artikelImListe = JOptionPane.showConfirmDialog(
-                    this,
-                    panelBezeichnung,
-                    "Artikel auswählen:",
-                    JOptionPane.OK_CANCEL_OPTION
-            );
-            if (artikelImListe != JOptionPane.OK_OPTION)
-                return;
-            String ausgewählt = (String) artikelBox.getSelectedItem();
-
-            if (ausgewählt == null) return;
-
-            String neueBezeichnung = JOptionPane.showInputDialog(
-                    this,
-                    "neue Bezeichnung:"
-            );
-            if (neueBezeichnung == null || neueBezeichnung.trim().isEmpty()) return;
-            try {
-                eShop.bezeichnungVeraendern(id, neueBezeichnung.trim());
-                ladeArtikelTabelle();
-                JOptionPane.showMessageDialog(this, "Bezeichnung erfolgreich geändert!");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Fehler beim ändern!");
-            }
-        }
-
-    }
-    //bestand andern
-    private void bestandVerandernDialog(){
-        JTextField bezeichnungField = new JTextField();
-        JTextField bestandField = new JTextField();
-
-        Object[] felder = {
-                "Bezeichnung: ", bezeichnungField,
-                "Neuer Bestand:", bestandField
-        };
-        int bestandResult = JOptionPane.showConfirmDialog(
-                this, felder, "Bestand ändern",
-                JOptionPane.OK_CANCEL_OPTION
-        );
-        if (bestandResult != JOptionPane.OK_OPTION){
-            return;
-        }
-        try {
-            String bezeichnung = bezeichnungField.getText().trim();
-            int neuerBestand = Integer.parseInt(bestandField.getText().trim());
-            if (bezeichnung.isEmpty() || neuerBestand < 0){
-                JOptionPane.showMessageDialog(this,
-                        "Ungültige Eingabe!:");
-                return;
-            }
-            Integer gefundeId = null;
-            for (int id : eShop.gibArtikelListe().keySet()) {
-                Artikel a = eShop.gibArtikelListe().get(id);
-                if (a.getBezeichnung().equalsIgnoreCase(bezeichnung)) {
-                    gefundeId = id;
-                    break;
-                }
-            }
-            if (gefundeId == null){
-                JOptionPane.showMessageDialog(this,
-                        "Artikel nicht gefunden!");
-                return;
-            }
-            eShop.bestandVeraendern(
-                    gefundeId,
-                    neuerBestand,
-                    eShop.aktuellerBenutzer().getBenutzerErkennung()
-            );
-            ladeArtikelTabelle();
-            JOptionPane.showMessageDialog(this,
-                    "Bezeichnung erfolgreich geändert!");
-        }catch (NumberFormatException ex){
-            JOptionPane.showMessageDialog(this,
-                    "Bitte gültige Zahl eingeben!");
-        }catch (Exception ex){
-            JOptionPane.showMessageDialog(this,
-                    "Fehler beim ändern");
-        }
-    }
-    //preis ändern
-    private void preisAndernDialog(){
-        String[] items = eShop.gibArtikelListe().values().stream()
-                .map(a -> a.getArtikelID() + " - " + a.getBezeichnung())
-                .toArray(String[]::new);
-
-        String ausgewählteArtikel = (String) JOptionPane.showInputDialog(
-                this,
-                "Artikel auswählen:",
-                "Preis ändern",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                items,
-                items[0]
-        );
-
-        if (ausgewählteArtikel  == null) return;
-
-        int id = Integer.parseInt(ausgewählteArtikel.split(" - ")[0]);
-
-        JTextField newPrice = new JTextField();
-
-        int ok = JOptionPane.showConfirmDialog(
-                this,
-                new Object[]{"Neuer Preis:", newPrice},
-                "Preis ändern",
-                JOptionPane.OK_CANCEL_OPTION
-        );
-
-        if (ok == JOptionPane.OK_OPTION) {
-            try {
-                float preis = Float.parseFloat(newPrice.getText());
-
-                eShop.preisVeraendern(id, preis);
-
-                ladeArtikelTabelle();
-                JOptionPane.showMessageDialog(this, "Preis geändert!");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Fehler!");
-            }
-        }
-    }
     // ereignisse tabelle hinzufügen
     private void zeigeEreignisseTabelle() {
         EreignisListeDialog dialog = new EreignisListeDialog(this, eShop);

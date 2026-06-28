@@ -100,7 +100,7 @@ public class ArtikelVW {
         artikelListe.get(artikelID).setBezeichnung(bezeichnung.toLowerCase());
     }
 
-    public void preisVeraendern(int artikelID, float preis) {
+    public void preisVeraendern(int artikelID, double preis) {
         artikelListe.get(artikelID).setPreis(preis);
     }
 
@@ -152,5 +152,9 @@ public class ArtikelVW {
 
     public String getArtikelName(int artikelID) {
         return artikelListe.get(artikelID).getBezeichnung().toLowerCase();
+    }
+
+    public double gibPreis(int artikelID) {
+        return artikelListe.get(artikelID).getPreis();
     }
 }

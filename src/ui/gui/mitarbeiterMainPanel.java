@@ -9,12 +9,14 @@ import java.awt.*;
 
 public class mitarbeiterMainPanel extends JPanel {
     private JLabel mitarbeiterLabel;
-    private JComboBox <String> aktionenComboBox;
     private JTextField sucheField;
     private JButton logoutButton;
-    private JButton loschenButton;
-    private JTable ereignisTable;
-    private DefaultTableModel ereignisModel;
+
+    private JButton artikelHinzufuegenButton;
+    private JButton artikelVeraendernButton;
+    private JButton ereignisseButton;
+    private JButton historieButton;
+    private JButton mitarbeiterRegButton;
 
     //mitarbeiter artikel tabelle "bestand"
     private JTable artikelTabelle;
@@ -26,103 +28,94 @@ public class mitarbeiterMainPanel extends JPanel {
 
         JPanel northPanel = new JPanel(new BorderLayout());
         northPanel.setBackground(new Color(255, 255, 255));
-     //titel label
+
+        //titel label
         JLabel eShopLabel = new JLabel("eShop - Mitarbeiter");
         eShopLabel.setFont(new Font("Arial", Font.BOLD, 26));
         eShopLabel.setHorizontalAlignment(SwingConstants.CENTER);
         northPanel.add(eShopLabel, BorderLayout.NORTH);
-     //loschen object
-        loschenButton = new JButton("löschen");
-     //toolbar label
-     JPanel toolbarPanel = new JPanel(new BorderLayout(10, 10));
-     toolbarPanel.setBackground(new Color(255, 255, 255));
-     //aktionen
-     String aktionen[] = {
-             "Artikel ansehen",
-             "neue Artikel im Katalog hinzufügen",
-             "Bezeichnung ändern",
-             "Artikel aus dem Katalog koplett löschen",
-             "Bestand ändern",
-             "Preis ändern",
-             "Ereignisse ansehen",
-             "Ereignisse speichern",
-             "Bestandhistorie anzeigen",
-             "neue Mitarbeiter registrieren",
-             "Daten speichern",
-     };
-     aktionenComboBox = new JComboBox<>(aktionen);
-     toolbarPanel.add(aktionenComboBox, BorderLayout.WEST);
 
-     // such bereich panel
-    JPanel suchpanel = new JPanel();
-    suchpanel.setBackground(new Color(255, 255, 255));
-    suchpanel.add(new JLabel("Artikel suchen:"));
-    sucheField = new JTextField(15);
-    suchpanel.add(sucheField);
-    toolbarPanel.add(suchpanel, BorderLayout.EAST);
+        // such bereich panel
+        JPanel suchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        suchPanel.setBackground(new Color(255, 255, 255));
+        suchPanel.add(new JLabel("Artikel suchen:"));
+        sucheField = new JTextField(15);
+        suchPanel.add(sucheField);
 
-    northPanel.add(toolbarPanel, BorderLayout.SOUTH);
-    add(northPanel, BorderLayout.NORTH);
+        northPanel.add(suchPanel, BorderLayout.SOUTH);
 
-    String [] spalten = {
-            "ID",
-            "Bezeichnung",
-            "Bestand",
-            "Preis"
+        add(northPanel, BorderLayout.NORTH);
 
-        };
+        String[] spalten = {"ID", "Bezeichnung", "Bestand", "Preis"};
         artikelTabelleModel = new DefaultTableModel(spalten,0);
         artikelTabelle = new JTable(artikelTabelleModel);
         JScrollPane sp = new JScrollPane(artikelTabelle);
         add(sp, BorderLayout.CENTER);
 
-    //south bereich
-    JPanel southPanel = new  JPanel(new BorderLayout());
-    southPanel.setBackground(new Color(242, 246, 252));
-     mitarbeiterLabel = new JLabel("Mitarbeiter: nicht angemeldet");
-     southPanel.add(mitarbeiterLabel, BorderLayout.WEST);
+        //south bereich
+        JPanel southPanel = new  JPanel(new GridLayout(2, 1));
+        JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        buttonBar.setBackground(new Color(242, 246, 252));
 
-     logoutButton = new JButton("Logout");
-     southPanel.add(logoutButton, BorderLayout.EAST);
-     add(southPanel, BorderLayout.SOUTH);
+        artikelHinzufuegenButton = new JButton("Artikel Hinzufügen");
+        artikelVeraendernButton = new JButton("Artikel verändern");
+        historieButton = new JButton("Bestandhistorie ansehen");
+
+        ereignisseButton = new JButton("Ereignisse ansehen");
+        mitarbeiterRegButton = new JButton("Mitarbeiter registrieren");
+
+        buttonBar.add(artikelHinzufuegenButton);
+        buttonBar.add(artikelVeraendernButton);
+        buttonBar.add(historieButton);
+
+        JLabel separator = new JLabel("|");
+        separator.setForeground(Color.LIGHT_GRAY); // Делаем её ненавязчиво серой
+        separator.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15)); // Отступы слева и справа
+        buttonBar.add(separator);
+
+        buttonBar.add(ereignisseButton);
+        buttonBar.add(mitarbeiterRegButton);
+
+        southPanel.add(buttonBar);
+
+        JPanel statusBar = new JPanel(new BorderLayout());
+        statusBar.setBackground(new Color(230, 235, 245));
+        statusBar.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        mitarbeiterLabel = new JLabel("Mitarbeiter: nicht angemeldet");
+        statusBar.add(mitarbeiterLabel, BorderLayout.WEST);
+
+        logoutButton = new JButton("Logout");
+        statusBar.add(logoutButton, BorderLayout.EAST);
+
+        southPanel.add(statusBar);
+
+        add(southPanel, BorderLayout.SOUTH);
 
     }
+
     public DefaultTableModel getArtikelTabelleModel() {
         return artikelTabelleModel;
     }
-
-    public JTable getArtikelTabelle() {
-        return artikelTabelle;
-    }
-
+    public JTable getArtikelTabelle() { return artikelTabelle; }
     public JButton getLogoutButton() {
         return logoutButton;
     }
+    public JTextField getSucheField() { return sucheField; }
+    public JLabel getMitarbeiterLabel() { return mitarbeiterLabel; }
 
-    public JTextField getSucheField() {
-        return sucheField;
-    }
+    public JButton getArtikelHinzufuegenButton() { return artikelHinzufuegenButton; }
+    public JButton getArtikelVeraendernButton() { return artikelVeraendernButton; }
+    public JButton getHistorieButton() { return historieButton; }
 
-    public JComboBox<String> getAktionenComboBox() {
-        return aktionenComboBox;
-    }
+    public JButton getEreignisseButton() { return ereignisseButton; }
+    public JButton getMitarbeiterRegButton() { return mitarbeiterRegButton; }
 
-    public JLabel getMitarbeiterLabel() {
-        return mitarbeiterLabel;
-    }
     public void setMitarbeiterName(String name){
         mitarbeiterLabel.setText("Mitarbeiter: " + name);
     }
-    public JButton getLoschenButton() {
-        return loschenButton;
-    }
-    public JTable getEreignisTable() {
-        return ereignisTable;
-    }
 
-    public DefaultTableModel getEreignisModel() {
-        return ereignisModel;
-    }
+
 
     public void filtereArtikel(String suchbegriff) {
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(artikelTabelleModel);

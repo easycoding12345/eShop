@@ -122,7 +122,7 @@ public class EShop {
         speichereArtikel();
     }
 
-    public void preisVeraendern(int artikelID, float preis) throws DateiNichtGefundenException {
+    public void preisVeraendern(int artikelID, double preis) throws DateiNichtGefundenException {
 
         if (preis < 0) {
             throw new UngueltigerPreisException(preis);
@@ -242,6 +242,8 @@ public class EShop {
 
         int aktuellerBestand = artikelVW.getBestand(artikelID);
 
+        Artikel a = artikelVW.findeArtikel(artikelID);
+
         if (aktuellerBestand < neuerBestand) {
 
             artikelVW.bestandErhoehen(
@@ -249,14 +251,14 @@ public class EShop {
                     neuerBestand - aktuellerBestand
             );
 
-            ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), neuerBestand - aktuellerBestand, "Einlagerung", "m:" + mitarbeiter);
+            ereignisVW.addEreignis(a, neuerBestand - aktuellerBestand, "Einlagerung", "m:" + mitarbeiter);
         } else {
             artikelVW.bestandVerringern(
                     artikelID,
                     aktuellerBestand - neuerBestand
             );
 
-            ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), aktuellerBestand - neuerBestand, "Auslagerung", "m:" + mitarbeiter);
+            ereignisVW.addEreignis(a, aktuellerBestand - neuerBestand, "Auslagerung", "m:" + mitarbeiter);
         }
 
         speichereArtikel();
@@ -272,6 +274,9 @@ public class EShop {
 
     public void packungGroesseVeraendern(int artikelID, int neueGroesse) {
         artikelVW.packungGroesseVeraendern(artikelID, neueGroesse);
+        if (getBestand(artikelID) % neueGroesse != 0) {
+            throw new MassengutartikelmengeNichtTeilbarException(getArtikelName(artikelID), neueGroesse);
+        }
     }
 
     public int getBestand(int artikelID) {
@@ -336,4 +341,11 @@ public class EShop {
         return ereignisVW.gibBestandHistorieAlsIntegers(artikelID);
     }
 
+    public Artikel findeArtikel(int artikelID) {
+        return artikelVW.findeArtikel(artikelID);
+    }
+
+    public double gibPreis(int artikelID) {
+        return artikelVW.gibPreis(artikelID);
+    }
 }
