@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import javax.swing.event.DocumentListener;
 
@@ -398,7 +399,7 @@ public class EShopGUI extends JFrame {
 
             try {
                 String b = bezeichnungField.getText().trim();
-                float p = Float.parseFloat(preisField.getText().trim());
+                BigDecimal p = new BigDecimal(preisField.getText().trim());
                 int m = Integer.parseInt(bestandField.getText().trim());
 
                 int id = eShop.gibArtikelListe().size();
@@ -441,7 +442,7 @@ public class EShopGUI extends JFrame {
 
             try {
                 String b = bezeichnungField.getText().trim();
-                float p = Float.parseFloat(preisField.getText().trim());
+                BigDecimal p = new BigDecimal(preisField.getText().trim());
                 int m = Integer.parseInt(bestandField.getText().trim());
                 int pg = Integer.parseInt(packungField.getText().trim());
 
@@ -594,6 +595,8 @@ public class EShopGUI extends JFrame {
     // PROGRAMMSTART
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+
+            TestDataGenerator.generiereUmfangreicheTestdaten(new EShop(), "Generator");
             try {
                 new EShopGUI();
             } catch (IOException e) {

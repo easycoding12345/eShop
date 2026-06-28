@@ -1,8 +1,10 @@
 package domain.exceptions;
 
+import java.math.BigDecimal;
+
 public class UngueltigerPreisException extends RuntimeException {
 
-    public UngueltigerPreisException(double preis) {
+    public UngueltigerPreisException(BigDecimal preis) {
         super("Ungültiger Preis: " + preis + ". Der Preis darf nicht negativ sein.");
     }
 }

@@ -7,6 +7,7 @@ import persistence.FilePersistenceManager;
 import persistence.PersistenceManager;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -26,7 +27,7 @@ public class EreignisVW {
                 Artikel artikel = findeArtikel.apply(String.valueOf(einEreignis.artikelID()));
 
                 if (artikel == null) {
-                    artikel = new Artikel(einEreignis.artikelID(), einEreignis.bezeichnung(), 0);
+                    artikel = new Artikel(einEreignis.artikelID(), einEreignis.bezeichnung(), BigDecimal.ZERO);
                 }
 
                 ereignisListe.add(new Ereignis(
@@ -76,21 +77,24 @@ public class EreignisVW {
                 .filter(e -> e.getArtikel() != null && e.getArtikel().getArtikelID() == artikelID)
                 .toList();
 
-        Map<LocalDate, Integer> historie = new LinkedHashMap<>();
+        Map<LocalDate, Integer> vollstaendigeHistorie = new LinkedHashMap<>();
 
-        int counter = 0;
         for (Ereignis e : events) {
             if (e.getTyp().equalsIgnoreCase("EINLAGERUNG")) {
                 bestand += e.getMenge();
             } else if (e.getTyp().equalsIgnoreCase("AUSLAGERUNG")) {
                 bestand -= e.getMenge();
             }
-            if (counter == 30) {
-                break;
-            }
-            historie.put(e.getTag(), bestand);
-            counter += 1;
+            vollstaendigeHistorie.put(e.getTag(), bestand);
         }
+
+        Map<LocalDate, Integer> historie = new LinkedHashMap<>();
+
+        int ignorieren = Math.max(0, vollstaendigeHistorie.size() - 30);
+
+        vollstaendigeHistorie.entrySet().stream()
+                .skip(ignorieren)
+                .forEach(entry -> historie.put(entry.getKey(), entry.getValue()));
 
         return historie;
     }

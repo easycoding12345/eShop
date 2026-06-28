@@ -8,6 +8,7 @@ import domain.exceptions.UngueltigerPreisException;
 
 import javax.swing.*;
 import java.awt.*;
+import java.math.BigDecimal;
 
 public class ArtikelVeraendernDialog extends JDialog {
     private final EShop eShop;
@@ -95,7 +96,7 @@ public class ArtikelVeraendernDialog extends JDialog {
         saveButton.addActionListener(e -> {
             try {
                 String neueBezeicnnung = artikelBezeichnungField.getText().trim();
-                double neuerPreis = Double.parseDouble(artikelPreisField.getText().trim());
+                BigDecimal neuerPreis = new BigDecimal(artikelPreisField.getText().trim());
                 int neuerBestand = Integer.parseInt(artikelBestandField.getText().trim());
                 int neuePackungsGroesse = Integer.parseInt(neuePackungsGroesseField.getText().trim());
 

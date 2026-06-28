@@ -4,6 +4,7 @@ import domain.exceptions.DateiNichtGefundenException;
 import entities.*;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class FilePersistenceManager implements PersistenceManager {
         int artikelID = Integer.parseInt(artikelIDString);
         String bezeichnung = liesZeile();
         String preisString = liesZeile();
-        float preis = Float.parseFloat(preisString);
+        BigDecimal preis = new BigDecimal(preisString);
 
         int packungGroesse = Integer.parseInt(liesZeile());
 

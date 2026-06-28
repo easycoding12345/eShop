@@ -1,11 +1,13 @@
 package entities;
 
+import java.math.BigDecimal;
+
 public class Artikel {
     private int artikelID;
     private String bezeichnung;
-    private double preis;
+    private BigDecimal preis;
 
-    public Artikel(int artikelID, String bezeichnung, float preis) {
+    public Artikel(int artikelID, String bezeichnung, BigDecimal preis) {
         this.artikelID = artikelID;
         this.bezeichnung = bezeichnung;
         this.preis = preis;
@@ -23,7 +25,7 @@ public class Artikel {
         return bezeichnung;
     }
 
-    public double getPreis() {
+    public BigDecimal getPreis() {
         return preis;
     }
 
@@ -31,7 +33,7 @@ public class Artikel {
         this.bezeichnung = newBezeichnung;
     }
 
-    public void setPreis(double newPreis) {
+    public void setPreis(BigDecimal newPreis) {
         this.preis = newPreis;
     }
 }

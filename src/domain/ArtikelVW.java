@@ -8,6 +8,7 @@ import persistence.FilePersistenceManager;
 import persistence.PersistenceManager;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class ArtikelVW {
         artikelListe.get(artikelID).setBezeichnung(bezeichnung.toLowerCase());
     }
 
-    public void preisVeraendern(int artikelID, double preis) {
+    public void preisVeraendern(int artikelID, BigDecimal preis) {
         artikelListe.get(artikelID).setPreis(preis);
     }
 
@@ -154,7 +155,7 @@ public class ArtikelVW {
         return artikelListe.get(artikelID).getBezeichnung().toLowerCase();
     }
 
-    public double gibPreis(int artikelID) {
+    public BigDecimal gibPreis(int artikelID) {
         return artikelListe.get(artikelID).getPreis();
     }
 }

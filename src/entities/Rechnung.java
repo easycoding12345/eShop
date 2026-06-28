@@ -1,5 +1,7 @@
 package entities;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +11,7 @@ public class Rechnung {
     private String kundeName;
     private HashMap<Integer, Integer> warenkorbListe;
     private HashMap<Integer, Artikel> artikelListe;
-    private static final double MWST = 0.19;
+    private static final BigDecimal MWST = new BigDecimal("0.19");
 
     public Rechnung(String kundeName, HashMap<Integer, Integer> warenkorbListe, HashMap<Integer, Artikel> artikelListe) {
         this.kundeName = kundeName;
@@ -20,8 +22,8 @@ public class Rechnung {
     public record GekaufterArtikel(
             int packungGroesse,
             String bezeichnung,
-            double preis,
-            double summe,
+            BigDecimal preis,
+            BigDecimal summe,
             int menge
     ) {}
 
@@ -42,8 +44,8 @@ public class Rechnung {
                 menge = entry.getValue();
             }
 
-            double preis = curArt.getPreis();
-            double summe = preis * menge;
+            BigDecimal preis = curArt.getPreis();
+            BigDecimal summe = preis.multiply(BigDecimal.valueOf(menge)).setScale(2, RoundingMode.HALF_EVEN);
 
             alleGekaufteArtikel.add(new GekaufterArtikel(packungGroesse, bezeichnung, preis, summe, menge));
         }
@@ -51,21 +53,21 @@ public class Rechnung {
         return alleGekaufteArtikel;
     }
 
-    public double getSumme() {
-        double summe = 0;
+    public BigDecimal getSumme() {
+        BigDecimal summe = BigDecimal.ZERO;
         for (GekaufterArtikel artikel : gibAlleGekaufteArtikel()) {
-            summe += artikel.summe();
+            summe = summe.add(artikel.summe());
         }
 
         return summe;
     }
 
-    public double getMwst()   {
-        return MWST * getSumme();
+    public BigDecimal getMwst()   {
+        return MWST.multiply(getSumme()).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public double getGesamtPreis() {
-        return getMwst() + getSumme();
+    public BigDecimal getGesamtPreis() {
+        return getMwst().add(getSumme());
     }
 
     public String getKundeName() {

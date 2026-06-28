@@ -6,7 +6,10 @@ import entities.Massengutartikel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.function.BiFunction;
 
 public class WarenkorbDialog extends JDialog {
 
@@ -79,7 +82,7 @@ public class WarenkorbDialog extends JDialog {
         );
 
         // WARENKORB LADEN
-        double gesamtSumme = 0;
+        BigDecimal gesamtSumme = BigDecimal.ZERO;
 
         for (Integer artikelID : warenkorb.keySet()) {
 
@@ -94,16 +97,16 @@ public class WarenkorbDialog extends JDialog {
                 continue;
             }
 
-            double einzelpreis =
+            BigDecimal einzelpreis =
                     artikel.getPreis();
 
-            double gesamtpreis = einzelpreis * menge;
+            BigDecimal gesamtpreis = einzelpreis.multiply(new BigDecimal(menge)).setScale(2, RoundingMode.HALF_EVEN);;
             if (artikel instanceof Massengutartikel) {
-                gesamtpreis = einzelpreis * menge / ((Massengutartikel) artikel).getPackungGroesse();
+                gesamtpreis = einzelpreis.multiply(new BigDecimal(menge)).divide(new BigDecimal(((Massengutartikel) artikel).getPackungGroesse()), 2, RoundingMode.HALF_EVEN);
             }
 
 
-            gesamtSumme += gesamtpreis;
+            gesamtSumme = gesamtSumme.add(gesamtpreis);
 
             tableModel.addRow(
                     new Object[]{
@@ -224,7 +227,7 @@ public class WarenkorbDialog extends JDialog {
         // Alte Tabellenzeilen löschen
         tableModel.setRowCount(0);
 
-        double gesamtSumme = 0;
+        BigDecimal gesamtSumme = BigDecimal.ZERO;
 
         for (Integer artikelID : warenkorb.keySet()) {
 
@@ -239,13 +242,13 @@ public class WarenkorbDialog extends JDialog {
                 continue;
             }
 
-            double einzelpreis =
+            BigDecimal einzelpreis =
                     artikel.getPreis();
 
-            double gesamtpreis =
-                    einzelpreis * menge;
+            BigDecimal gesamtpreis =
+                    einzelpreis.multiply(new BigDecimal(menge)).setScale(2, RoundingMode.HALF_EVEN);
 
-            gesamtSumme += gesamtpreis;
+            gesamtSumme = gesamtSumme.add(gesamtpreis);
 
             tableModel.addRow(
                     new Object[]{

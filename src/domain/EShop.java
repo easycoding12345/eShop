@@ -4,11 +4,9 @@ import domain.exceptions.*;
 import entities.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class EShop {
@@ -45,7 +43,7 @@ public class EShop {
     }
 
 
-    public void fuegeArtikelEin(int artikelID, String bezeichnung, int menge, float preis, String mitarbeiter) throws DateiNichtGefundenException {
+    public void fuegeArtikelEin(int artikelID, String bezeichnung, int menge, BigDecimal preis, String mitarbeiter) throws DateiNichtGefundenException {
         Artikel art = new Artikel(artikelID, bezeichnung.toLowerCase(), preis);
 
         if (artikelVW.findeArtikel(artikelID) == null) {
@@ -55,7 +53,7 @@ public class EShop {
             // Artikel existiert → Bestand erhöhen
             artikelVW.bestandErhoehen(artikelID, menge);
         }
-        if (preis < 0) {
+        if (preis.compareTo(BigDecimal.ZERO) < 0) {
             throw new UngueltigerPreisException(preis);
         }
         if (menge <= 0) {
@@ -71,11 +69,11 @@ public class EShop {
             int artikelID,
             String bezeichnung,
             int menge,
-            float preis,
+            BigDecimal preis,
             String mitarbeiter,
             int packungGroesse
     ) throws UngueltigeMengeException, UngueltigerPreisException, MengeWenigerAlsPackungGroesseException, MassengutartikelmengeNichtTeilbarException, DateiNichtGefundenException {
-        if (preis < 0) {
+        if (preis.compareTo(BigDecimal.ZERO) < 0) {
             throw new UngueltigerPreisException(preis);
         }
 
@@ -122,9 +120,9 @@ public class EShop {
         speichereArtikel();
     }
 
-    public void preisVeraendern(int artikelID, double preis) throws DateiNichtGefundenException {
+    public void preisVeraendern(int artikelID, BigDecimal preis) throws DateiNichtGefundenException {
 
-        if (preis < 0) {
+        if (preis.compareTo(BigDecimal.ZERO) < 0) {
             throw new UngueltigerPreisException(preis);
         }
 
@@ -350,7 +348,7 @@ public class EShop {
         return artikelVW.findeArtikel(artikelID);
     }
 
-    public double gibPreis(int artikelID) {
+    public BigDecimal gibPreis(int artikelID) {
         return artikelVW.gibPreis(artikelID);
     }
 }

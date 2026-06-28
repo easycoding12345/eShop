@@ -8,6 +8,7 @@ import entities.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -73,7 +74,7 @@ public class EShopClientCUI {
         int artikelID;
         int menge;
         String bezeichnung;
-        float preis;
+        BigDecimal preis;
         int bestand = 0;
         Benutzer aktuelleBenutzer;
         int packungGroesse = 1;
@@ -147,7 +148,7 @@ public class EShopClientCUI {
 
                 System.out.print("Preis > ");
                 try {
-                    preis = Float.parseFloat(liesEingabe());
+                    preis = new BigDecimal(liesEingabe());
                 } catch (NumberFormatException e) {
                     System.out.println(RED +
                             "Ungültige Eingabe. Bitte geben Sie eine ganze Zahl ein."
@@ -618,7 +619,7 @@ public class EShopClientCUI {
                 System.out.print("Neuer Preis > ");
 
                 try{
-                    preis = Float.parseFloat(liesEingabe());
+                    preis = new BigDecimal(liesEingabe());
                     eShop.preisVeraendern(artikelID, preis);
 
                     System.out.println(YELLOW + "✔ Preis erfolgreich geändert." + RESET);
