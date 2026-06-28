@@ -13,3 +13,8 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Persistence
+Ereignisse.txt
+eShop_A.txt
+eShop_AM.txt
