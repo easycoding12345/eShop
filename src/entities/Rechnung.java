@@ -37,7 +37,7 @@ public class Rechnung {
             String bezeichnung = curArt.getBezeichnung();
             if (curArt instanceof Massengutartikel) {
                 packungGroesse = ((Massengutartikel) curArt).getPackungGroesse();
-                bezeichnung += " [" + ((Massengutartikel) curArt).getPackungGroesse() + "]";
+                bezeichnung += " (" + ((Massengutartikel) curArt).getPackungGroesse() + " in der Packung)";
                 menge = entry.getValue() / ((Massengutartikel) curArt).getPackungGroesse();
             } else {
                 packungGroesse = 1;

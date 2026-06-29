@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 
 public class WarenkorbVW {
-//    private HashMap<Integer, Integer> warenkorbMenge = new HashMap<>();
     // Warenkorb warenkorb = new Warenkorb(Benutzer); // TODO: eigentlich sollte hier Benutzer sein
     Warenkorb warenkorb = new Warenkorb();
 

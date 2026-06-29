@@ -59,8 +59,7 @@ public class WarenkorbDialog extends JDialog {
             }
         };
 
-        warenkorbTable =
-                new JTable(tableModel);
+        warenkorbTable = new JTable(tableModel);
         //Tablekopft einfärben
         warenkorbTable.getTableHeader().setBackground(new Color(70, 130, 180));
         warenkorbTable.getTableHeader().setForeground(Color.WHITE);
@@ -85,12 +84,9 @@ public class WarenkorbDialog extends JDialog {
         BigDecimal gesamtSumme = BigDecimal.ZERO;
 
         for (Integer artikelID : warenkorb.keySet()) {
+            Artikel artikel = artikelListe.get(artikelID);
 
-            Artikel artikel =
-                    artikelListe.get(artikelID);
-
-            int menge =
-                    warenkorb.get(artikelID);
+            int menge = warenkorb.get(artikelID);
 
             // Artikel mit Menge 0 nicht anzeigen
             if (menge <= 0) {
@@ -105,18 +101,30 @@ public class WarenkorbDialog extends JDialog {
                 gesamtpreis = einzelpreis.multiply(new BigDecimal(menge)).divide(new BigDecimal(((Massengutartikel) artikel).getPackungGroesse()), 2, RoundingMode.HALF_EVEN);
             }
 
-
             gesamtSumme = gesamtSumme.add(gesamtpreis);
 
-            tableModel.addRow(
-                    new Object[]{
-                            artikel.getArtikelID(),
-                            artikel.getBezeichnung(),
-                            String.format("%.2f €", einzelpreis),
-                            menge,
-                            String.format("%.2f €", gesamtpreis)
-                    }
-            );
+            if (artikel instanceof Massengutartikel) {
+                tableModel.addRow(
+                        new Object[]{
+                                artikel.getArtikelID(),
+                                artikel.getBezeichnung() + " (" + ((Massengutartikel) artikel).getPackungGroesse() + " in der Packung)",
+                                String.format("%.2f €", einzelpreis),
+                                menge,
+                                String.format("%.2f €", gesamtpreis)
+                        }
+                );
+            } else {
+                tableModel.addRow(
+                        new Object[]{
+                                artikel.getArtikelID(),
+                                artikel.getBezeichnung(),
+                                String.format("%.2f €", einzelpreis),
+                                menge,
+                                String.format("%.2f €", gesamtpreis)
+                        }
+                );
+            }
+
         }
 
         // UNTERER BEREICH
@@ -231,34 +239,45 @@ public class WarenkorbDialog extends JDialog {
 
         for (Integer artikelID : warenkorb.keySet()) {
 
-            Artikel artikel =
-                    artikelListe.get(artikelID);
+            Artikel artikel = artikelListe.get(artikelID);
 
-            int menge =
-                    warenkorb.get(artikelID);
+
+            int menge = warenkorb.get(artikelID);
 
             // Artikel mit Menge 0 nicht anzeigen
             if (menge <= 0) {
                 continue;
             }
 
-            BigDecimal einzelpreis =
-                    artikel.getPreis();
+            BigDecimal einzelpreis = artikel.getPreis();
 
-            BigDecimal gesamtpreis =
-                    einzelpreis.multiply(new BigDecimal(menge)).setScale(2, RoundingMode.HALF_EVEN);
+            BigDecimal gesamtpreis = einzelpreis.multiply(new BigDecimal(menge)).setScale(2, RoundingMode.HALF_EVEN);
 
             gesamtSumme = gesamtSumme.add(gesamtpreis);
 
-            tableModel.addRow(
-                    new Object[]{
-                            artikel.getArtikelID(),
-                            artikel.getBezeichnung(),
-                            String.format("%.2f €", einzelpreis),
-                            menge,
-                            String.format("%.2f €", gesamtpreis)
-                    }
-            );
+            if (artikel instanceof Massengutartikel) {
+                tableModel.addRow(
+                        new Object[]{
+                                artikel.getArtikelID(),
+                                artikel.getBezeichnung() + " (" + ((Massengutartikel) artikel).getPackungGroesse() + " in der Packung)",
+                                String.format("%.2f €", einzelpreis),
+                                menge,
+                                String.format("%.2f €", gesamtpreis)
+                        }
+                );
+            } else {
+                tableModel.addRow(
+                        new Object[]{
+                                artikel.getArtikelID(),
+                                artikel.getBezeichnung(),
+                                String.format("%.2f €", einzelpreis),
+                                menge,
+                                String.format("%.2f €", gesamtpreis)
+                        }
+                );
+            }
+
+
         }
 
         // Neue Gesamtsumme anzeigen

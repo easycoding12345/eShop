@@ -41,8 +41,6 @@ public class EShopGUI extends JFrame {
     private mitarbeiterLoginPanel mitarbeiterLoginPanel;
     private mitarbeiterMainPanel mitarbeiterMainPanel;
 
-    private JButton warenkorbButton;
-
     public EShopGUI() throws IOException {
 
         // ESHOP INITIALISIEREN
@@ -337,13 +335,21 @@ public class EShopGUI extends JFrame {
         artikelModel.setRowCount(0);
         for (int id : eShop.gibArtikelListe().keySet()) {
             Artikel a = eShop.gibArtikelListe().get(id);
-            artikelModel.addRow(new Object[]{
-                    a.getArtikelID(),
-                    a.getBezeichnung(),
-                    eShop.gibArtikelMengeListe().get(id),
-                    a.getPreis()
-            });
-
+            if (a instanceof Massengutartikel) {
+                artikelModel.addRow(new Object[]{
+                        a.getArtikelID(),
+                        a.getBezeichnung() + " (" + ((Massengutartikel) a).getPackungGroesse() + " in der Packung)",
+                        eShop.gibArtikelMengeListe().get(id),
+                        a.getPreis()
+                });
+            } else {
+                artikelModel.addRow(new Object[]{
+                        a.getArtikelID(),
+                        a.getBezeichnung(),
+                        eShop.gibArtikelMengeListe().get(id),
+                        a.getPreis()
+                });
+            }
         }
     }
 

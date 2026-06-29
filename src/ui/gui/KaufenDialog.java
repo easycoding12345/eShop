@@ -52,7 +52,7 @@ public class KaufenDialog extends JDialog {
         topBar.add(separator1, BorderLayout.SOUTH);
 
         add(topBar, BorderLayout.NORTH);
-        
+
         JPanel artikelInfoPanel = new JPanel(new BorderLayout());
 
         String[] spalten = {"Bezeichnung", "Menge", "Preis"};

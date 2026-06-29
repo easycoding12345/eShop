@@ -145,7 +145,6 @@ public class EShop {
         }
 
         if (istMassengutartikel(artikelID)) {
-
             if (menge < getPackungGroesse(artikelID)) {
                 throw new MengeWenigerAlsPackungGroesseException(
                         getArtikelName(artikelID),
@@ -160,11 +159,10 @@ public class EShop {
                         getPackungGroesse(artikelID)
                 );
             }
-        } else {
-            warenkorbVW.einfuegen(artikelID, menge);
-            artikelVW.bestandVerringern(artikelID, menge);
-            ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
         }
+        warenkorbVW.einfuegen(artikelID, menge);
+        artikelVW.bestandVerringern(artikelID, menge);
+        ereignisVW.addEreignis(artikelVW.findeArtikel(artikelID), menge, "Auslagerung", "k:" + kunde);
 
         speichereArtikel();
     }
